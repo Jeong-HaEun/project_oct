@@ -20,6 +20,7 @@
 
 - React 19 + Vite 8 (JavaScript, TypeScript 아님)
 - 린트: ESLint (`eslint.config.js`) · 모양 정리: Prettier (`.prettierrc`)
+- 디자인: Tailwind 4 · 규칙 `docs/design/design.md` (스킬 `design-rules`, 파일 수정 후 훅이 금지 목록 자동 검사)
 - 커밋 검문소: husky + lint-staged + commitlint — 메시지 형식 `타입(범위): 설명` (feat·fix·test·refactor·chore·docs)
 - 테스트: Node 내장 `node --test` (설치 불필요, `*.test.js`) — 아직 테스트 없음
 

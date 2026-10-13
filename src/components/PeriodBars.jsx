@@ -1,5 +1,6 @@
-// WoW 막대 비교 (design.md 5-8 막대). 지표 1개당 그래프 1개, 이번 주는 좋아짐 파랑 · 나빠짐 빨강.
-// 값 계산은 summarizeCards · buildWowBars 가 하고, 여기서는 그리기만 한다.
+// 기간 비교 막대 (design.md 5-8 막대). WoW · MoM 이 함께 쓴다. 지표 1개당 그래프 1개.
+// 이번 기간 막대는 좋아짐 파랑 · 나빠짐 빨강 · 판단 안 함(광고비 · 변화 없음) 진한 회색, 지난 기간은 회색.
+// 값 계산은 utils 가 하고(summarizeCards · summarizeMom · buildPeriodBars), 여기서는 그리기만 한다.
 import {
   Bar,
   BarChart,
@@ -10,11 +11,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { CARD_FORMATTERS } from '../utils/format.js'
-import { buildWowBars } from '../utils/metrics.js'
+import { CARD_FORMATTERS, formatDelta } from '../utils/format.js'
+import { buildPeriodBars } from '../utils/metrics.js'
 import { ChangeBadge } from './ChangeBadge.jsx'
 
-// 지난주는 회색 기준 막대. 이번 주는 좋아짐 파랑 · 나빠짐 빨강 · 판단 안 함(광고비 · 변화 없음) 진한 회색
 const PREVIOUS_COLOR = 'var(--color-muted)'
 const CURRENT_COLORS = {
   good: 'var(--color-good)',
@@ -29,28 +29,43 @@ function barColor(bar, change) {
 
 const AXIS_TEXT = { fill: 'var(--color-muted)', fontSize: 12 }
 
-export function WowBars({ cards }) {
+// items: [{ key, title, current, previous, change, delta? }]
+export function PeriodBars({
+  items,
+  previousLabel,
+  currentLabel,
+  emptyMessage,
+}) {
   return (
     <div className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4">
-      {cards.map((card) => (
-        <WowBarCard key={card.key} card={card} />
+      {items.map((item) => (
+        <PeriodBarCard
+          key={item.key}
+          item={item}
+          bars={buildPeriodBars(item, previousLabel, currentLabel)}
+          emptyMessage={emptyMessage}
+        />
       ))}
     </div>
   )
 }
 
-function WowBarCard({ card }) {
-  const bars = buildWowBars(card)
-  const format = CARD_FORMATTERS[card.key]
+function PeriodBarCard({ item, bars, emptyMessage }) {
+  const format = CARD_FORMATTERS[item.key]
 
   return (
     <div className="rounded-lg border border-hairline bg-surface p-4 md:p-5">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-muted">{card.title}</h3>
-        {card.change && <ChangeBadge change={card.change} />}
+        <h3 className="text-sm font-semibold text-muted">{item.title}</h3>
+        {item.change && (
+          <ChangeBadge
+            change={item.change}
+            delta={formatDelta(item.delta ?? null)}
+          />
+        )}
       </div>
       {bars === null ? (
-        <p className="mt-3 text-sm text-muted">비교할 지난주 데이터 없음</p>
+        <p className="mt-3 text-sm text-muted">{emptyMessage}</p>
       ) : (
         <div className="mt-2 h-24">
           <ResponsiveContainer width="100%" height="100%">
@@ -65,14 +80,14 @@ function WowBarCard({ card }) {
               <YAxis
                 type="category"
                 dataKey="label"
-                width={52}
+                width={72}
                 tick={AXIS_TEXT}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip
                 cursor={{ fill: 'var(--color-canvas)' }}
-                formatter={(value) => [format(value), card.title]}
+                formatter={(value) => [format(value), item.title]}
               />
               <Bar
                 dataKey="value"
@@ -80,7 +95,7 @@ function WowBarCard({ card }) {
                 isAnimationActive={false}
               >
                 {bars.map((bar) => (
-                  <Cell key={bar.key} fill={barColor(bar, card.change)} />
+                  <Cell key={bar.key} fill={barColor(bar, item.change)} />
                 ))}
                 <LabelList
                   dataKey="value"

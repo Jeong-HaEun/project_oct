@@ -30,7 +30,7 @@ export const CARD_FORMATTERS = {
 }
 
 // 배지 숫자: 절댓값 반올림 + 단위 ('25%', '4%p'). 계산 불가면 ''
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function formatDelta(delta) {
-  throw new Error('not implemented')
+  if (delta === null) return ''
+  return `${Math.round(Math.abs(delta.value))}${delta.unit}`
 }

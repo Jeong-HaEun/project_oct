@@ -5,10 +5,12 @@ import { DataDateBar } from '../components/DataDateBar.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
+import { PeriodBars } from '../components/PeriodBars.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
-import { WowBars } from '../components/WowBars.jsx'
 import {
+  formatMonthRange,
   getLatestDate,
+  getMonthToDateRanges,
   getTodayKst,
   getUploadDelayDays,
 } from '../utils/dates.js'
@@ -17,6 +19,7 @@ import {
   compareFunnelByMedia,
   summarizeCards,
   summarizeFunnel,
+  summarizeMom,
 } from '../utils/metrics.js'
 
 export function SummaryPage({ rows }) {
@@ -41,6 +44,8 @@ export function SummaryPage({ rows }) {
   const cards = summarizeCards(mediaRows, latestDate)
   const funnel = summarizeFunnel(mediaRows, latestDate)
   const comparison = compareFunnelByMedia(rows, latestDate)
+  const momItems = summarizeMom(mediaRows, latestDate)
+  const momRanges = getMonthToDateRanges(latestDate)
   const delayDays = getUploadDelayDays(latestDate, getTodayKst())
 
   return (
@@ -59,7 +64,26 @@ export function SummaryPage({ rows }) {
         <p className="mt-1 text-xs text-muted">
           {media ?? '전체'} · 최근 7일 vs 그 전 7일
         </p>
-        <WowBars cards={cards} />
+        <PeriodBars
+          items={cards}
+          previousLabel="지난주"
+          currentLabel="이번 주"
+          emptyMessage="비교할 지난주 데이터 없음"
+        />
+      </section>
+      <section aria-labelledby="mom-title" className="mt-6 md:mt-8">
+        <h2 id="mom-title" className="font-display text-lg font-bold">
+          전월 대비 (MoM)
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 이번 달과 지난달의 같은 기간
+        </p>
+        <PeriodBars
+          items={momItems}
+          previousLabel={formatMonthRange(momRanges.previous)}
+          currentLabel={formatMonthRange(momRanges.current)}
+          emptyMessage="비교할 지난달 데이터 없음"
+        />
       </section>
       <section aria-labelledby="funnel-title" className="mt-6 md:mt-8">
         <h2 id="funnel-title" className="font-display text-lg font-bold">

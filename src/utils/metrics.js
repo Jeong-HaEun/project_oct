@@ -1,5 +1,6 @@
 // 지표 계산 함수 모음. 계산할 수 없으면 null 을 돌려준다 ('-' 표시는 format.js).
 import { countDays, filterByDateRange, getWeekRanges } from './dates.js'
+import { filterByMedia, MEDIA_LIST } from './media.js'
 
 const NUMBER_FIELDS = [
   'cost',
@@ -85,19 +86,75 @@ export function summarizeCards(rows, latestDate) {
 // ---- 퍼널 (이슈 #3) ----
 
 // 뒤 단계 ÷ 앞 단계 × 100. 앞 단계가 0 이면 null
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+// × 100 을 먼저 해서 소수 오차를 줄인다
 export function calcRate(numerator, denominator) {
-  throw new Error('not implemented')
+  if (denominator === 0) return null
+  return (numerator * 100) / denominator
+}
+
+const FUNNEL_STAGES = [
+  { key: 'impressions', label: '노출' },
+  { key: 'clicks', label: '클릭' },
+  { key: 'carts', label: '장바구니' },
+  { key: 'conversions', label: '구매' },
+]
+
+// 비율 = 뒤 단계(to) ÷ 앞 단계(from) (metrics.md 퍼널 지표)
+const FUNNEL_RATES = [
+  { key: 'ctr', label: 'CTR', from: 'impressions', to: 'clicks' },
+  { key: 'cartRate', label: '담기율', from: 'clicks', to: 'carts' },
+  {
+    key: 'purchaseRate',
+    label: '장바구니→구매율',
+    from: 'carts',
+    to: 'conversions',
+  },
+]
+
+// 최근 7일 합계
+function sumCurrentWeek(rows, latestDate) {
+  const { current } = getWeekRanges(latestDate)
+  return sumTotals(filterByDateRange(rows, current.start, current.end))
 }
 
 // 최근 7일 단계 흐름 { stages, rates }. 매체 필터를 거친 줄을 받는다
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function summarizeFunnel(rows, latestDate) {
-  throw new Error('not implemented')
+  const totals = sumCurrentWeek(rows, latestDate)
+  return {
+    stages: FUNNEL_STAGES.map(({ key, label }) => ({
+      key,
+      label,
+      count: totals[key],
+    })),
+    rates: FUNNEL_RATES.map(({ key, label, from, to }) => ({
+      key,
+      label,
+      value: calcRate(totals[to], totals[from]),
+    })),
+  }
+}
+
+// 값이 가장 낮은 매체들. 비교할 값이 2개 미만이거나 모두 같으면 [] (issue-3 결정 2~4)
+function findLowest(byMedia, rateKey) {
+  const compared = byMedia.filter((item) => item.rates[rateKey] !== null)
+  if (compared.length < 2) return []
+  const min = Math.min(...compared.map((item) => item.rates[rateKey]))
+  const lowest = compared.filter((item) => item.rates[rateKey] === min)
+  if (lowest.length === compared.length) return []
+  return lowest.map((item) => item.media)
 }
 
 // 3개 매체 단계 비율과 단계별 최저 { byMedia, lowest }. 필터와 무관하게 전체 줄을 받는다
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function compareFunnelByMedia(rows, latestDate) {
-  throw new Error('not implemented')
+  const byMedia = MEDIA_LIST.map((media) => {
+    const { rates } = summarizeFunnel(filterByMedia(rows, media), latestDate)
+    return {
+      media,
+      rates: Object.fromEntries(rates.map(({ key, value }) => [key, value])),
+    }
+  })
+  const lowest = Object.fromEntries(
+    FUNNEL_RATES.map(({ key }) => [key, findLowest(byMedia, key)]),
+  )
+  return { byMedia, lowest }
 }

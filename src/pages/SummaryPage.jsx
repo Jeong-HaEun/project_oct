@@ -2,6 +2,8 @@
 // 매체 필터 값은 주소(?media=)가 보관한다 (PRD ADR-3).
 import { useSearchParams } from 'react-router'
 import { DataDateBar } from '../components/DataDateBar.jsx'
+import { FunnelCompare } from '../components/FunnelCompare.jsx'
+import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
 import {
@@ -10,7 +12,11 @@ import {
   getUploadDelayDays,
 } from '../utils/dates.js'
 import { filterByMedia, parseMedia } from '../utils/media.js'
-import { summarizeCards } from '../utils/metrics.js'
+import {
+  compareFunnelByMedia,
+  summarizeCards,
+  summarizeFunnel,
+} from '../utils/metrics.js'
 
 export function SummaryPage({ rows }) {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -29,7 +35,11 @@ export function SummaryPage({ rows }) {
     return <p className="mt-6 text-sm text-ink md:mt-8">아직 데이터가 없어요</p>
   }
 
-  const cards = summarizeCards(filterByMedia(rows, media), latestDate)
+  // 카드 · 단계 흐름은 필터를 따르고, 매체별 비교는 전체 줄을 쓴다 (spec 결정 6)
+  const mediaRows = filterByMedia(rows, media)
+  const cards = summarizeCards(mediaRows, latestDate)
+  const funnel = summarizeFunnel(mediaRows, latestDate)
+  const comparison = compareFunnelByMedia(rows, latestDate)
   const delayDays = getUploadDelayDays(latestDate, getTodayKst())
 
   return (
@@ -40,6 +50,15 @@ export function SummaryPage({ rows }) {
         {cards.map((card) => (
           <SummaryCard key={card.key} card={card} />
         ))}
+      </section>
+      <section aria-labelledby="funnel-title" className="mt-6 md:mt-8">
+        <h2 id="funnel-title" className="font-display text-lg font-bold">
+          퍼널 분석
+        </h2>
+        <div className="mt-3">
+          <FunnelFlow funnel={funnel} scopeLabel={media ?? '전체'} />
+          <FunnelCompare comparison={comparison} />
+        </div>
       </section>
     </>
   )

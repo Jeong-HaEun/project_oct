@@ -30,7 +30,7 @@ export function SummaryPage({ rows }) {
   // 기준일은 전체 데이터 기준 (issue-2-tests.md 결정 A)
   const latestDate = getLatestDate(rows)
 
-  // 임시: 빈 데이터 화면(버튼 포함)은 이슈 8 에서 만든다
+  // 임시: 빈 데이터 화면(버튼 포함)은 "빈 데이터 화면" 이슈에서 만든다
   if (latestDate === null) {
     return <p className="mt-6 text-sm text-ink md:mt-8">아직 데이터가 없어요</p>
   }

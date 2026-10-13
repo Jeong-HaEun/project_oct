@@ -1,13 +1,6 @@
 // 합계 카드 하나 (design.md 5-2). 큰 숫자 = 최근 7일, 작은 글씨 = 전주 값 + 전주 대비.
-import { formatPercent, formatWon } from '../utils/format.js'
+import { CARD_FORMATTERS } from '../utils/format.js'
 import { ChangeBadge } from './ChangeBadge.jsx'
-
-const FORMATTERS = {
-  cost: formatWon,
-  revenue: formatWon,
-  roas: formatPercent,
-  cpa: formatWon,
-}
 
 // ROAS·CPA 큰 숫자만 토마토 (design.md 2절)
 const NUMBER_COLORS = {
@@ -27,7 +20,7 @@ function splitUnit(text) {
 }
 
 export function SummaryCard({ card }) {
-  const format = FORMATTERS[card.key]
+  const format = CARD_FORMATTERS[card.key]
   const [number, unit] = splitUnit(format(card.current))
 
   return (

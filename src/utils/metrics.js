@@ -158,3 +158,11 @@ export function compareFunnelByMedia(rows, latestDate) {
   )
   return { byMedia, lowest }
 }
+
+// ---- WoW 막대 (이슈 #20) ----
+
+// 카드 하나 → 막대 2개 [지난주, 이번 주]. 지난주가 없으면 null (비교 불가)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildWowBars(card) {
+  throw new Error('not implemented')
+}

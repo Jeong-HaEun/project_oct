@@ -1,11 +1,11 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { getDownloadRange } from './dates.js'
+import { getPresetRange } from './dates.js'
 import {
   buildDownloadFileName,
   buildReportsCsv,
   parseReportCsv,
-  selectDownloadRows,
+  selectRows,
 } from './csv.js'
 
 const LATEST = '2026-10-07'
@@ -37,31 +37,29 @@ function datesOf(rows) {
   return rows.map((item) => item.reportDate)
 }
 
-// getDownloadRange
+// getPresetRange (이슈 #19 에서 98일 고정 → 기간 선택으로 바뀜)
 
-test('S1 [정상] 기준일 10/7 → 7/2~10/7 (98일)', () => {
-  assert.deepEqual(getDownloadRange(LATEST), RANGE)
+test('S1 [정상] 최근 98일: 기준일 10/7 → 7/2~10/7', () => {
+  assert.deepEqual(getPresetRange('last98', LATEST), RANGE)
 })
 
-// selectDownloadRows
+// selectRows (고른 기간 = 최근 98일 7/2~10/7)
 
 test('S2 [경계] 7/1 (99일째) → 빠짐', () => {
   const rows = [row('2026-07-01'), row(LATEST)]
-  assert.deepEqual(datesOf(selectDownloadRows(rows, null, LATEST)), [LATEST])
+  assert.deepEqual(datesOf(selectRows(rows, null, RANGE)), [LATEST])
 })
 
 test('S3 [경계] 7/2 (98일째) → 들어감', () => {
   const rows = [row('2026-07-02'), row(LATEST)]
-  assert.deepEqual(datesOf(selectDownloadRows(rows, null, LATEST)), [
+  assert.deepEqual(datesOf(selectRows(rows, null, RANGE)), [
     '2026-07-02',
     LATEST,
   ])
 })
 
 test('S4 [경계] 10/7 (기준일) → 들어감', () => {
-  assert.deepEqual(datesOf(selectDownloadRows([row(LATEST)], null, LATEST)), [
-    LATEST,
-  ])
+  assert.deepEqual(datesOf(selectRows([row(LATEST)], null, RANGE)), [LATEST])
 })
 
 test('S5 [정상] META 를 고르면 META 줄만', () => {
@@ -70,7 +68,7 @@ test('S5 [정상] META 를 고르면 META 줄만', () => {
     row(LATEST, { media: 'META' }),
     row(LATEST, { media: 'GOOGLE' }),
   ]
-  const result = selectDownloadRows(rows, 'META', LATEST)
+  const result = selectRows(rows, 'META', RANGE)
   assert.deepEqual(
     result.map((item) => item.media),
     ['META'],
@@ -79,7 +77,7 @@ test('S5 [정상] META 를 고르면 META 줄만', () => {
 
 test('S6 [정상] 섞인 순서로 넣어도 날짜 오래된 순', () => {
   const rows = [row('2026-10-03'), row('2026-07-05'), row('2026-09-01')]
-  assert.deepEqual(datesOf(selectDownloadRows(rows, null, LATEST)), [
+  assert.deepEqual(datesOf(selectRows(rows, null, RANGE)), [
     '2026-07-05',
     '2026-09-01',
     '2026-10-03',

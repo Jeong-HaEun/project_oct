@@ -26,3 +26,35 @@ export function buildTemplateCsv() {
   const header = CSV_COLUMNS.map((column) => column.header).join(',')
   return `${BOM}${header}${LINE_BREAK}`
 }
+
+// ---- CSV 업로드 (이슈 #10) ----
+
+// UTF-8 로 읽어 보고, 깨지면 EUC-KR(엑셀 기본)로 다시 읽는다
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function decodeCsv(buffer) {
+  throw new Error('not implemented')
+}
+
+// '2026/10/1' · '2026. 10. 1.' → '2026-10-01'. 없는 날짜는 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function normalizeDate(value) {
+  throw new Error('not implemented')
+}
+
+// '100,000' → 100000. 0 이상 정수가 아니면 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function normalizeNumber(value) {
+  throw new Error('not implemented')
+}
+
+// CSV 글자 → { rows, errors }. errors 가 하나라도 있으면 서버로 보내지 않는다
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function parseReportCsv(text) {
+  throw new Error('not implemented')
+}
+
+// { created, updated } → '새로 3줄 · 바뀐 2줄'
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function formatUploadResult(result) {
+  throw new Error('not implemented')
+}

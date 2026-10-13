@@ -162,6 +162,11 @@ rounded-lg border border-hairline bg-surface p-4 md:p-5
 - 선 `var(--color-primary)` 2px, 점 지름 4px / 격자 `var(--color-hairline)` 가로선만 / 축 글자 `var(--color-muted)` 12px.
 - 데이터 없는 날은 0 이 아니라 빈칸 (`connectNulls={false}`).
 - 마지막 점 옆에 값 표시 (test1007 과 같음).
+- **막대 (기간 비교, WoW · MoM):** 가로 막대. 지금 기간 `var(--color-primary)`, 비교 기간 `var(--color-muted)` (강조 방식: 지금이 주인공, 비교는 배경).
+  - 막대는 0 에서 시작, 끝 모서리 4px 둥글게, 막대 사이 간격 2px 이상.
+  - 막대 옆에 기간 이름("지난주 / 이번 주")과 값을 글자로 항상 표시 — 색만으로 구분하지 않는다. 값 글자는 `var(--color-ink)`, 기간 이름은 `var(--color-muted)` 12px.
+  - 계산 불가 값은 막대 없이 `-`. 마우스를 올리면 툴팁으로 값.
+  - 색 검사(2026-10-13, dataviz 검사 도구): primary ↔ muted 색각 ΔE 11.1 (기준 8 이상), muted 대비 흰 바탕 3:1 이상.
 
 ## 6. 화면 상태 (spec 결정 4)
 

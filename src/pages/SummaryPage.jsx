@@ -1,6 +1,6 @@
 // 요약 페이지 (/). 계산은 utils 함수를 부르기만 한다.
 import { DataDateBar } from '../components/DataDateBar.jsx'
-import { SummaryCard } from '../components/SummaryCard.jsx'
+import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
 import {
   getLatestDate,
   getTodayKst,
@@ -22,10 +22,7 @@ export function SummaryPage({ rows }) {
   return (
     <>
       <DataDateBar latestDate={latestDate} delayDays={delayDays} />
-      <section
-        aria-label="최근 7일 합계"
-        className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
-      >
+      <section aria-label="최근 7일 합계" className={`mt-3 ${CARD_GRID}`}>
         {cards.map((card) => (
           <SummaryCard key={card.key} card={card} />
         ))}

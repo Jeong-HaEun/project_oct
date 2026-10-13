@@ -1,6 +1,8 @@
 // 최상위 컴포넌트: 처음 열릴 때 전체 데이터를 한 번 불러온다 (PRD ADR-2).
 import { useEffect, useState } from 'react'
 import { fetchReports } from './api/reports.js'
+import { ErrorState } from './components/ErrorState.jsx'
+import { LoadingState } from './components/LoadingState.jsx'
 import { SummaryPage } from './pages/SummaryPage.jsx'
 
 export function App() {
@@ -43,40 +45,5 @@ export function App() {
         )}
       </main>
     </>
-  )
-}
-
-// 불러오는 중 (design.md 6절): 카드 자리에 회색 막대 + 안내 문구
-function LoadingState() {
-  return (
-    <div className="mt-6 md:mt-8">
-      <p role="status" className="text-sm text-muted">
-        서버를 깨우는 중이에요. 최대 1분 걸릴 수 있어요
-      </p>
-      <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        {[0, 1, 2, 3].map((index) => (
-          <div key={index} className="h-28 animate-pulse rounded bg-hairline" />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// 서버 오류 (design.md 6절): 카드 + 빨간 테두리 + [다시 시도] 주요 버튼(5-3)
-function ErrorState({ message, onRetry }) {
-  return (
-    <div
-      role="alert"
-      className="mt-6 rounded-lg border border-bad bg-surface p-4 md:mt-8 md:p-5"
-    >
-      <p className="text-sm text-bad">{message}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-3 h-11 rounded bg-primary-strong px-4 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-strong active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        다시 시도
-      </button>
-    </div>
   )
 }

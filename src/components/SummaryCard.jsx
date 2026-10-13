@@ -17,6 +17,9 @@ const NUMBER_COLORS = {
   cpa: 'text-primary',
 }
 
+// 카드 4개 배치: 모바일 2×2, 넓은 화면 한 줄 (design.md 7절). 불러오는 중 막대도 같이 쓴다
+export const CARD_GRID = 'grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4'
+
 // '1,234원' → ['1,234', '원']. 단위는 작은 글씨로 따로 그린다 (design.md 3절 보조 글)
 function splitUnit(text) {
   const unit = text.match(/[원%]$/)?.[0] ?? ''

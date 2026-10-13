@@ -97,11 +97,40 @@ export function formatMonthRange({ start, end }) {
   return `${month}월 ${startDay}~${endDay}일`
 }
 
-// ---- 98일 내려받기 (이슈 #15) ----
+// ---- 원본 데이터 기간 (이슈 #19) ----
 
-// 기준일 포함 98일 (14주)
-const DOWNLOAD_DAYS = 98
+// 빠른 버튼 순서
+export const RANGE_PRESETS = [
+  { key: 'last7', label: '최근 7일' },
+  { key: 'last14', label: '최근 14일' },
+  { key: 'last98', label: '최근 98일' },
+  { key: 'thisMonth', label: '이번 달' },
+]
 
-export function getDownloadRange(latestDate) {
-  return { start: daysBefore(latestDate, DOWNLOAD_DAYS - 1), end: latestDate }
+// 빠른 버튼의 기간 (모두 기준일에서 끝남)
+// 최근 N일은 기준일 포함 N일, 이번 달은 1일~기준일
+const PRESET_DAYS = { last7: 7, last14: 14, last98: 98 }
+
+export function getPresetRange(presetKey, latestDate) {
+  if (presetKey === 'thisMonth') {
+    return getMonthToDateRanges(latestDate).current
+  }
+  return {
+    start: daysBefore(latestDate, PRESET_DAYS[presetKey] - 1),
+    end: latestDate,
+  }
+}
+
+// 비었거나 시작일이 끝일보다 늦으면 안내 문구, 괜찮으면 null
+export function validateRange({ start, end }) {
+  if (!start || !end) return '시작일과 끝일을 골라 주세요'
+  // "YYYY-MM-DD" 는 글자 순서 = 날짜 순서
+  if (start > end) return '시작일이 끝일보다 늦어요'
+  return null
+}
+
+// { start, end } → '7/2~10/7' (하루면 '10/7')
+export function formatRangeLabel({ start, end }) {
+  if (start === end) return formatShortDate(end)
+  return `${formatShortDate(start)}~${formatShortDate(end)}`
 }

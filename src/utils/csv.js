@@ -1,6 +1,6 @@
 // CSV 양식 함수 모음. 제목 줄 이름은 test1007 샘플 CSV 와 같다.
 import Papa from 'papaparse'
-import { filterByDateRange, getDownloadRange } from './dates.js'
+import { filterByDateRange } from './dates.js'
 import { filterByMedia, parseMedia } from './media.js'
 
 // CSV 제목 ↔ JSON 필드 짝 (api.md 순서, id 제외). 파일에는 '전환', 화면에서만 "구매"
@@ -148,11 +148,10 @@ export function formatUploadResult({ created, updated }) {
   return `새로 ${created}줄 · 바뀐 ${updated}줄`
 }
 
-// ---- 98일 내려받기 (이슈 #15) ----
+// ---- 원본 데이터 표 · 내려받기 (이슈 #15 · #19) ----
 
-// 매체 필터 + 98일 + 날짜 오래된 순
-export function selectDownloadRows(rows, media, latestDate) {
-  const { start, end } = getDownloadRange(latestDate)
+// 매체 필터 + 고른 기간 + 날짜 오래된 순 (표 · 내려받기 공통)
+export function selectRows(rows, media, { start, end }) {
   // sort 는 같은 날짜끼리 받은 순서를 지킨다
   return [...filterByDateRange(filterByMedia(rows, media), start, end)].sort(
     (a, b) => a.reportDate.localeCompare(b.reportDate),

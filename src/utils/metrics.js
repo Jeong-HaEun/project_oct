@@ -169,3 +169,23 @@ export function buildWowBars({ current, previous }) {
     { key: 'current', label: '이번 주', value: current },
   ]
 }
+
+// ---- MoM 막대 (이슈 #13) ----
+
+// ROAS 는 차이(%p), 나머지는 증감률(%). 부호 있는 값, 반올림 안 함
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function calcMomDelta(key, current, previous) {
+  throw new Error('not implemented')
+}
+
+// 이번 달 1일~기준일 vs 지난달 같은 기간, 카드처럼 4지표
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeMom(rows, latestDate) {
+  throw new Error('not implemented')
+}
+
+// WoW · MoM 공통 막대 2개 [지난 기간, 이번 기간]. 지난 값이 없으면 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildPeriodBars(item, previousLabel, currentLabel) {
+  throw new Error('not implemented')
+}

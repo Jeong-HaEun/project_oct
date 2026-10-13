@@ -56,3 +56,17 @@ export function formatShortDate(date) {
   const [, month, day] = date.split('-')
   return `${Number(month)}/${Number(day)}`
 }
+
+// ---- MoM 같은 기간 (이슈 #13) ----
+
+// 이번 달 1일~기준일, 지난달 같은 기간 (지난달에 그 날짜가 없으면 말일까지)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function getMonthToDateRanges(latestDate) {
+  throw new Error('not implemented')
+}
+
+// { start, end } → '9월 1~7일' (하루면 '9월 1일')
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function formatMonthRange(range) {
+  throw new Error('not implemented')
+}

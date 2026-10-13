@@ -168,6 +168,17 @@ rounded-lg border border-hairline bg-surface p-4 md:p-5
   - 계산 불가 값은 막대 없이 `-`. 마우스를 올리면 툴팁으로 값.
   - 색 검사(2026-10-13, dataviz 검사 도구): good · bad · muted 세 막대 색각 ΔE 최소 12.2 (기준 8 이상), 모두 흰 바탕 대비 3:1 이상. good 흰 바탕 대비 6.0:1.
 
+### 5-9. 페이지 이동 [요약] [원본 데이터] (2026-10-13)
+
+- 5-4 알약과 같은 모양. 지금 페이지는 `aria-current="page"` 로 표시하고 `aria-[current=page]:` 에 5-4 "선택됨" 클래스를 그대로 쓴다.
+- 머리글 둘째 줄 (휴대폰에서 첫 줄은 제목 + 버튼으로 꽉 참). 이동할 때 `?media=` 를 그대로 들고 간다.
+
+### 5-10. 기간 고르기 (원본 데이터 페이지, 2026-10-13)
+
+- 빠른 버튼: 5-4 알약 그대로 (최근 7일 · 최근 14일 · 최근 98일 · 이번 달).
+- 날짜 칸: `h-11 rounded border border-hairline bg-surface px-3 text-sm text-ink tabular-nums` + 키보드 선택은 버튼과 같은 `focus-visible:` 클래스. 이름표 "시작일" · "끝일" 은 `text-xs text-muted`.
+- 잘못된 기간 안내: `text-sm text-bad`.
+
 ## 6. 화면 상태 (spec 결정 4)
 
 | 상태        | 모양                                                                                                                                    |

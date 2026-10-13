@@ -1,10 +1,13 @@
-// 최상위 컴포넌트: 처음 열릴 때 전체 데이터를 한 번 불러온다 (PRD ADR-2).
+// 최상위 컴포넌트: 처음 열릴 때 전체 데이터를 한 번 불러오고, 주소에 맞는 페이지를 보여 준다 (PRD ADR-1 · ADR-2).
 import { useEffect, useState } from 'react'
+import { Route, Routes } from 'react-router'
 import { fetchReports } from './api/reports.js'
 import { CsvUploadButton } from './components/CsvUploadButton.jsx'
 import { ErrorState } from './components/ErrorState.jsx'
 import { LoadingState } from './components/LoadingState.jsx'
+import { PageNav } from './components/PageNav.jsx'
 import { UploadMessage } from './components/UploadMessage.jsx'
+import { DataPage } from './pages/DataPage.jsx'
 import { SummaryPage } from './pages/SummaryPage.jsx'
 import { buildTemplateCsv, TEMPLATE_FILE_NAME } from './utils/csv.js'
 import { downloadText } from './utils/download.js'
@@ -65,6 +68,10 @@ export function App() {
             <CsvUploadButton onResult={handleUploadResult} />
           </div>
         </div>
+        {/* 휴대폰 머리글이 좁아 페이지 이동은 둘째 줄 */}
+        <div className="mx-auto max-w-6xl px-3.5 pb-3 md:px-6">
+          <PageNav />
+        </div>
       </header>
       <main className="mx-auto max-w-6xl px-3.5 pb-12 md:px-6">
         {uploadResult && <UploadMessage result={uploadResult} />}
@@ -73,7 +80,10 @@ export function App() {
         ) : rows === null ? (
           <LoadingState />
         ) : (
-          <SummaryPage rows={rows} />
+          <Routes>
+            <Route path="/" element={<SummaryPage rows={rows} />} />
+            <Route path="/data" element={<DataPage rows={rows} />} />
+          </Routes>
         )}
       </main>
     </>

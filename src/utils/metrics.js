@@ -1,5 +1,11 @@
 // 지표 계산 함수 모음. 계산할 수 없으면 null 을 돌려준다 ('-' 표시는 format.js).
-import { countDays, filterByDateRange, getWeekRanges } from './dates.js'
+import {
+  countDays,
+  filterByDateRange,
+  getMonthToDateRanges,
+  getRangeLength,
+  getWeekRanges,
+} from './dates.js'
 import { filterByMedia, MEDIA_LIST } from './media.js'
 
 const NUMBER_FIELDS = [
@@ -162,10 +168,47 @@ export function compareFunnelByMedia(rows, latestDate) {
 // ---- WoW 막대 (이슈 #20) ----
 
 // 카드 하나 → 막대 2개 [지난주, 이번 주]. 지난주가 없으면 null (비교 불가)
-export function buildWowBars({ current, previous }) {
-  if (previous === null) return null
+export function buildWowBars(card) {
+  return buildPeriodBars(card, '지난주', '이번 주')
+}
+
+// ---- MoM 막대 (이슈 #13) ----
+
+// ROAS 는 차이(%p), 나머지는 증감률(%). 부호 있는 값, 반올림 안 함
+export function calcMomDelta(key, current, previous) {
+  if (current === null || previous === null) return null
+  if (key === 'roas') return { value: current - previous, unit: '%p' }
+  if (previous === 0) return null
+  return { value: ((current - previous) * 100) / previous, unit: '%' }
+}
+
+// 이번 달 1일~기준일 vs 지난달 같은 기간, 카드처럼 4지표
+// 지난달 같은 기간에 빠진 날이 있으면 비교하지 않는다 (issue-13-tests.md 결정 2)
+export function summarizeMom(rows, latestDate) {
+  const { current, previous } = getMonthToDateRanges(latestDate)
+  const now = cardValues(rows, current)
+  const hasFullPrevious =
+    countDays(rows, previous.start, previous.end) === getRangeLength(previous)
+  const before = hasFullPrevious ? cardValues(rows, previous) : null
+
+  return CARDS.map(({ key, title, goodWhen }) => {
+    const previousValue = before ? before[key] : null
+    return {
+      key,
+      title,
+      current: now[key],
+      previous: previousValue,
+      change: compareChange(now[key], previousValue, goodWhen),
+      delta: calcMomDelta(key, now[key], previousValue),
+    }
+  })
+}
+
+// WoW · MoM 공통 막대 2개 [지난 기간, 이번 기간]. 지난 값이 없으면 null
+export function buildPeriodBars(item, previousLabel, currentLabel) {
+  if (item.previous === null) return null
   return [
-    { key: 'previous', label: '지난주', value: previous },
-    { key: 'current', label: '이번 주', value: current },
+    { key: 'previous', label: previousLabel, value: item.previous },
+    { key: 'current', label: currentLabel, value: item.current },
   ]
 }

@@ -28,3 +28,9 @@ export const CARD_FORMATTERS = {
   roas: formatPercent,
   cpa: formatWon,
 }
+
+// 배지 숫자: 절댓값 반올림 + 단위 ('25%', '4%p'). 계산 불가면 ''
+export function formatDelta(delta) {
+  if (delta === null) return ''
+  return `${Math.round(Math.abs(delta.value))}${delta.unit}`
+}

@@ -1,5 +1,12 @@
 // 날짜 계산 함수 모음. 날짜는 "YYYY-MM-DD" 문자열로 주고받는다.
-import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns'
+import {
+  differenceInCalendarDays,
+  format,
+  parseISO,
+  startOfMonth,
+  subDays,
+  subMonths,
+} from 'date-fns'
 
 // 기준일에서 days 일 전 날짜 문자열
 function daysBefore(date, days) {
@@ -55,4 +62,37 @@ export function getUploadDelayDays(latestDate, today) {
 export function formatShortDate(date) {
   const [, month, day] = date.split('-')
   return `${Number(month)}/${Number(day)}`
+}
+
+// ---- MoM 같은 기간 (이슈 #13) ----
+
+// 이번 달 1일~기준일, 지난달 같은 기간 (지난달에 그 날짜가 없으면 말일까지)
+export function getMonthToDateRanges(latestDate) {
+  const date = parseISO(latestDate)
+  // subMonths 는 없는 날짜를 그 달 말일로 맞춘다 (3/31 → 2/28)
+  const previousEnd = subMonths(date, 1)
+  return {
+    current: { start: toDateText(startOfMonth(date)), end: latestDate },
+    previous: {
+      start: toDateText(startOfMonth(previousEnd)),
+      end: toDateText(previousEnd),
+    },
+  }
+}
+
+// 기간에 들어 있는 날 수 (시작 · 끝 포함)
+export function getRangeLength({ start, end }) {
+  return differenceInCalendarDays(parseISO(end), parseISO(start)) + 1
+}
+
+function toDateText(date) {
+  return format(date, 'yyyy-MM-dd')
+}
+
+// { start, end } → '9월 1~7일' (하루면 '9월 1일')
+export function formatMonthRange({ start, end }) {
+  const [, month, startDay] = start.split('-').map(Number)
+  const endDay = Number(end.split('-')[2])
+  if (start === end) return `${month}월 ${startDay}일`
+  return `${month}월 ${startDay}~${endDay}일`
 }

@@ -31,11 +31,11 @@ export function SummaryCard({ card }) {
   const [number, unit] = splitUnit(format(card.current))
 
   return (
-    <article className="rounded-lg border border-hairline bg-surface p-4 md:p-5">
+    <article className="rounded-lg border border-hairline bg-surface p-3 md:p-5">
       <h2 className="text-sm font-semibold text-muted">{card.title}</h2>
       <p className="mt-1 whitespace-nowrap">
         <span
-          className={`font-display text-2xl font-extrabold tabular-nums md:text-3xl ${NUMBER_COLORS[card.key]}`}
+          className={`font-display text-xl font-extrabold tabular-nums md:text-3xl ${NUMBER_COLORS[card.key]}`}
         >
           {number}
         </span>

@@ -19,8 +19,8 @@ export const CSV_COLUMNS = [
 
 export const TEMPLATE_FILE_NAME = 'adporter_양식.csv'
 
-// 엑셀이 UTF-8 한글로 읽게 하는 표시, CSV 표준 줄바꿈
-const BOM = '﻿'
+// 엑셀이 UTF-8 한글로 읽게 하는 표시 (보이지 않는 글자라 코드로 만든다), CSV 표준 줄바꿈
+const BOM = String.fromCharCode(0xfeff)
 const LINE_BREAK = '\r\n'
 
 // BOM + 제목 줄 1줄 (예시 줄 없음)

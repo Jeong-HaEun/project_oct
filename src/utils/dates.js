@@ -96,3 +96,11 @@ export function formatMonthRange({ start, end }) {
   if (start === end) return `${month}월 ${startDay}일`
   return `${month}월 ${startDay}~${endDay}일`
 }
+
+// ---- 98일 내려받기 (이슈 #15) ----
+
+// 기준일 포함 98일 (14주)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function getDownloadRange(latestDate) {
+  throw new Error('not implemented')
+}

@@ -146,3 +146,23 @@ export function parseReportCsv(text) {
 export function formatUploadResult({ created, updated }) {
   return `새로 ${created}줄 · 바뀐 ${updated}줄`
 }
+
+// ---- 98일 내려받기 (이슈 #15) ----
+
+// 매체 필터 + 98일 + 날짜 오래된 순
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function selectDownloadRows(rows, media, latestDate) {
+  throw new Error('not implemented')
+}
+
+// BOM + 제목 줄 + 원본 줄 (양식과 같은 칸). 다시 올릴 수 있어야 한다
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildReportsCsv(rows) {
+  throw new Error('not implemented')
+}
+
+// 'adporter_META_2026-07-02_2026-10-07.csv' (전체면 '전체')
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildDownloadFileName(media, range) {
+  throw new Error('not implemented')
+}

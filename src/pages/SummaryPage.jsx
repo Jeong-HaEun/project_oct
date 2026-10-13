@@ -9,11 +9,18 @@ import { PeriodBars } from '../components/PeriodBars.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
 import {
   formatMonthRange,
+  getDownloadRange,
   getLatestDate,
   getMonthToDateRanges,
   getTodayKst,
   getUploadDelayDays,
 } from '../utils/dates.js'
+import {
+  buildDownloadFileName,
+  buildReportsCsv,
+  selectDownloadRows,
+} from '../utils/csv.js'
+import { downloadText } from '../utils/download.js'
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   compareFunnelByMedia,
@@ -47,11 +54,33 @@ export function SummaryPage({ rows }) {
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
   const delayDays = getUploadDelayDays(latestDate, getTodayKst())
+  const downloadRows = selectDownloadRows(rows, media, latestDate)
+  const scopeLabel = media ?? '전체'
+
+  // 보고 있는 매체의 최근 98일 원본 줄 (spec 결정 7)
+  function handleDownload() {
+    const fileName = buildDownloadFileName(media, getDownloadRange(latestDate))
+    downloadText(fileName, buildReportsCsv(downloadRows))
+  }
 
   return (
     <>
       <MediaFilter media={media} onChange={handleMediaChange} />
-      <DataDateBar latestDate={latestDate} delayDays={delayDays} />
+      <DataDateBar
+        latestDate={latestDate}
+        delayDays={delayDays}
+        action={
+          downloadRows.length > 0 && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="h-11 whitespace-nowrap rounded border border-hairline bg-surface px-4 text-sm font-semibold text-ink hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-strong active:bg-primary-tint"
+            >
+              {scopeLabel} · 최근 98일 내려받기
+            </button>
+          )
+        }
+      />
       <section aria-label="최근 7일 합계" className={`mt-3 ${CARD_GRID}`}>
         {cards.map((card) => (
           <SummaryCard key={card.key} card={card} />

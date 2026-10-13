@@ -1,6 +1,7 @@
 // CSV 양식 함수 모음. 제목 줄 이름은 test1007 샘플 CSV 와 같다.
 import Papa from 'papaparse'
-import { parseMedia } from './media.js'
+import { filterByDateRange, getDownloadRange } from './dates.js'
+import { filterByMedia, parseMedia } from './media.js'
 
 // CSV 제목 ↔ JSON 필드 짝 (api.md 순서, id 제외). 파일에는 '전환', 화면에서만 "구매"
 export const CSV_COLUMNS = [
@@ -150,19 +151,30 @@ export function formatUploadResult({ created, updated }) {
 // ---- 98일 내려받기 (이슈 #15) ----
 
 // 매체 필터 + 98일 + 날짜 오래된 순
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function selectDownloadRows(rows, media, latestDate) {
-  throw new Error('not implemented')
+  const { start, end } = getDownloadRange(latestDate)
+  // sort 는 같은 날짜끼리 받은 순서를 지킨다
+  return [...filterByDateRange(filterByMedia(rows, media), start, end)].sort(
+    (a, b) => a.reportDate.localeCompare(b.reportDate),
+  )
+}
+
+// 쉼표 · 따옴표 · 줄바꿈이 든 칸은 따옴표로 감싸고, 따옴표는 두 번 쓴다
+function toCsvCell(value) {
+  const text = String(value)
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
 }
 
 // BOM + 제목 줄 + 원본 줄 (양식과 같은 칸). 다시 올릴 수 있어야 한다
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function buildReportsCsv(rows) {
-  throw new Error('not implemented')
+  const header = CSV_COLUMNS.map((column) => column.header).join(',')
+  const lines = rows.map((row) =>
+    CSV_COLUMNS.map((column) => toCsvCell(row[column.field])).join(','),
+  )
+  return BOM + [header, ...lines].map((line) => line + LINE_BREAK).join('')
 }
 
 // 'adporter_META_2026-07-02_2026-10-07.csv' (전체면 '전체')
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
-export function buildDownloadFileName(media, range) {
-  throw new Error('not implemented')
+export function buildDownloadFileName(media, { start, end }) {
+  return `adporter_${media ?? '전체'}_${start}_${end}.csv`
 }

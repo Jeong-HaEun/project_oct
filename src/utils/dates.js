@@ -100,7 +100,8 @@ export function formatMonthRange({ start, end }) {
 // ---- 98일 내려받기 (이슈 #15) ----
 
 // 기준일 포함 98일 (14주)
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+const DOWNLOAD_DAYS = 98
+
 export function getDownloadRange(latestDate) {
-  throw new Error('not implemented')
+  return { start: daysBefore(latestDate, DOWNLOAD_DAYS - 1), end: latestDate }
 }

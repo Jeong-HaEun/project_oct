@@ -1,0 +1,58 @@
+// 날짜 계산 함수 모음. 날짜는 "YYYY-MM-DD" 문자열로 주고받는다.
+import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns'
+
+// 기준일에서 days 일 전 날짜 문자열
+function daysBefore(date, days) {
+  return format(subDays(parseISO(date), days), 'yyyy-MM-dd')
+}
+
+export function getLatestDate(rows) {
+  if (rows.length === 0) return null
+  return rows.reduce(
+    (latest, row) => (row.reportDate > latest ? row.reportDate : latest),
+    rows[0].reportDate,
+  )
+}
+
+// 최근 7일 = 기준일 포함 7일, 전주 = 그 바로 앞 7일
+export function getWeekRanges(latestDate) {
+  return {
+    current: { start: daysBefore(latestDate, 6), end: latestDate },
+    previous: {
+      start: daysBefore(latestDate, 13),
+      end: daysBefore(latestDate, 7),
+    },
+  }
+}
+
+// "YYYY-MM-DD" 는 글자 순서 = 날짜 순서라서 문자열로 비교한다
+export function filterByDateRange(rows, start, end) {
+  return rows.filter((row) => row.reportDate >= start && row.reportDate <= end)
+}
+
+export function countDays(rows, start, end) {
+  const dates = filterByDateRange(rows, start, end).map((row) => row.reportDate)
+  return new Set(dates).size
+}
+
+// 누가 어디서 보든 한국 시간 기준 오늘 (en-CA 는 YYYY-MM-DD 모양으로 나온다)
+// 테스트는 now 를 넘기고, 화면은 비워 두면 지금 시각을 쓴다
+export function getTodayKst(now = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now)
+}
+
+// 어제까지 올라와 있으면 0, 그보다 밀린 날 수
+export function getUploadDelayDays(latestDate, today) {
+  const days = differenceInCalendarDays(parseISO(today), parseISO(latestDate))
+  return Math.max(0, days - 1)
+}
+
+export function formatShortDate(date) {
+  const [, month, day] = date.split('-')
+  return `${Number(month)}/${Number(day)}`
+}

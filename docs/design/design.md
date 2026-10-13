@@ -55,7 +55,7 @@
 | -------------------------- | ----------------------------------------------------------------- |
 | 페이지 제목 (Adporter)     | `font-display text-2xl md:text-3xl font-extrabold tracking-tight` |
 | 구역 제목 (퍼널 분석 등)   | `font-display text-lg font-bold`                                  |
-| 카드 큰 숫자               | `font-display text-2xl md:text-3xl font-extrabold tabular-nums`   |
+| 카드 큰 숫자               | `font-display text-xl md:text-3xl font-extrabold tabular-nums`    |
 | 카드 이름 (총 광고비 등)   | `text-sm font-semibold text-muted`                                |
 | 본문 · 표 숫자             | `text-sm`                                                         |
 | 보조 글 (기간, 설명, 단위) | `text-xs text-muted`                                              |
@@ -94,6 +94,8 @@ sticky top-0 z-10 border-b border-hairline bg-surface/90 backdrop-blur-sm
 ```
 rounded-lg border border-hairline bg-surface p-4 md:p-5
 ```
+
+- 합계 카드만 예외: 모바일에서 2×2 로 좁아서 `p-3 md:p-5` (360px 에서 9자리 금액이 카드 안에 들어가게).
 
 ### 5-3. 버튼
 

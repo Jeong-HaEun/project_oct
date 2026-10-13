@@ -81,3 +81,23 @@ export function summarizeCards(rows, latestDate) {
     }
   })
 }
+
+// ---- 퍼널 (이슈 #3) ----
+
+// 뒤 단계 ÷ 앞 단계 × 100. 앞 단계가 0 이면 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function calcRate(numerator, denominator) {
+  throw new Error('not implemented')
+}
+
+// 최근 7일 단계 흐름 { stages, rates }. 매체 필터를 거친 줄을 받는다
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeFunnel(rows, latestDate) {
+  throw new Error('not implemented')
+}
+
+// 3개 매체 단계 비율과 단계별 최저 { byMedia, lowest }. 필터와 무관하게 전체 줄을 받는다
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function compareFunnelByMedia(rows, latestDate) {
+  throw new Error('not implemented')
+}

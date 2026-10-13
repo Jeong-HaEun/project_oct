@@ -99,8 +99,8 @@ const FUNNEL_STAGES = [
   { key: 'conversions', label: '구매' },
 ]
 
-// 비율 = 뒤 단계(to) ÷ 앞 단계(from) (metrics.md 퍼널 지표)
-const FUNNEL_RATES = [
+// 비율 = 뒤 단계(to) ÷ 앞 단계(from) (metrics.md 퍼널 지표). 비교 표 열 순서·이름으로도 쓴다
+export const FUNNEL_RATES = [
   { key: 'ctr', label: 'CTR', from: 'impressions', to: 'clicks' },
   { key: 'cartRate', label: '담기율', from: 'clicks', to: 'carts' },
   {

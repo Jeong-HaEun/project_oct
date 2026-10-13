@@ -158,3 +158,14 @@ export function compareFunnelByMedia(rows, latestDate) {
   )
   return { byMedia, lowest }
 }
+
+// ---- WoW 막대 (이슈 #20) ----
+
+// 카드 하나 → 막대 2개 [지난주, 이번 주]. 지난주가 없으면 null (비교 불가)
+export function buildWowBars({ current, previous }) {
+  if (previous === null) return null
+  return [
+    { key: 'previous', label: '지난주', value: previous },
+    { key: 'current', label: '이번 주', value: current },
+  ]
+}

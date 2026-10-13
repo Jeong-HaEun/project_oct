@@ -20,3 +20,11 @@ export function formatRate(value) {
 export function formatCount(value) {
   return value.toLocaleString('ko-KR')
 }
+
+// 합계 카드 key → 표시 함수 (카드 · WoW 막대가 함께 쓴다)
+export const CARD_FORMATTERS = {
+  cost: formatWon,
+  revenue: formatWon,
+  roas: formatPercent,
+  cpa: formatWon,
+}

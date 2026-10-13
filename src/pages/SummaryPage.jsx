@@ -6,6 +6,7 @@ import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
+import { WowBars } from '../components/WowBars.jsx'
 import {
   getLatestDate,
   getTodayKst,
@@ -50,6 +51,15 @@ export function SummaryPage({ rows }) {
         {cards.map((card) => (
           <SummaryCard key={card.key} card={card} />
         ))}
+      </section>
+      <section aria-labelledby="wow-title" className="mt-6 md:mt-8">
+        <h2 id="wow-title" className="font-display text-lg font-bold">
+          전주 대비 (WoW)
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 최근 7일 vs 그 전 7일
+        </p>
+        <WowBars cards={cards} />
       </section>
       <section aria-labelledby="funnel-title" className="mt-6 md:mt-8">
         <h2 id="funnel-title" className="font-display text-lg font-bold">

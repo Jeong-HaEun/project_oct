@@ -9,7 +9,8 @@ const OPTIONS = [{ value: null, label: '전체' }].concat(
   MEDIA_LIST.map((media) => ({ value: media, label: media })),
 )
 
-export function MediaFilter({ media, onChange }) {
+// disabled: 데이터 0건이면 누를 수 없게 (design.md 5-4 비활성)
+export function MediaFilter({ media, onChange, disabled = false }) {
   return (
     <div
       role="group"
@@ -21,6 +22,7 @@ export function MediaFilter({ media, onChange }) {
           key={option.label}
           type="button"
           aria-pressed={media === option.value}
+          disabled={disabled}
           onClick={() => onChange(option.value)}
           className={PILL_CLASSES}
         >

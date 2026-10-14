@@ -134,3 +134,10 @@ export function formatRangeLabel({ start, end }) {
   if (start === end) return formatShortDate(end)
   return `${formatShortDate(start)}~${formatShortDate(end)}`
 }
+
+// 최근 7일 안에 데이터가 있는 날 수 0~7 (이슈 #11, 매체 필터를 거친 줄을 받는다)
+export function countRecentDays(rows, latestDate) {
+  if (latestDate === null) return 0
+  const { current } = getWeekRanges(latestDate)
+  return countDays(rows, current.start, current.end)
+}

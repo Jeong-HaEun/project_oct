@@ -41,3 +41,10 @@ export function formatBestCondition({ minCost, minConversions }) {
     minCost === 0 ? '광고비 제한 없음' : `광고비 ${minCost / 10000}만 원 이상`
   return `${cost} · 구매 ${minConversions}건 이상`
 }
+
+// 카드 이름 옆 표시: 7일이면 null, 1~6일 '최근 3일 기준', 0일 '최근 7일 데이터 없음' (이슈 #11)
+export function formatCoverage(days) {
+  if (days >= 7) return null
+  if (days === 0) return '최근 7일 데이터 없음'
+  return `최근 ${days}일 기준`
+}

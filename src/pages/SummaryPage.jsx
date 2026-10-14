@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router'
 import { BestCreatives } from '../components/BestCreatives.jsx'
 import { BestOptions } from '../components/BestOptions.jsx'
 import { DataDateBar } from '../components/DataDateBar.jsx'
+import { EmptyState } from '../components/EmptyState.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
@@ -15,9 +16,10 @@ import {
   getLatestDate,
   getMonthToDateRanges,
   getTodayKst,
+  countRecentDays,
   getUploadDelayDays,
 } from '../utils/dates.js'
-import { formatBestCondition } from '../utils/format.js'
+import { formatBestCondition, formatCoverage } from '../utils/format.js'
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   BEST_DEFAULT_OPTIONS,
@@ -32,17 +34,18 @@ import {
 // BEST 소재 부제에 쓰는 순위 기준 글
 const SORT_TEXT = { roas: 'ROAS 높은 순', conversions: '구매 많은 순' }
 
-export function SummaryPage({ rows }) {
+// onTemplateDownload · onUploadResult: 빈 화면 버튼이 머리글 버튼과 같은 일을 하게 App 이 넘긴다
+export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const [searchParams, setSearchParams] = useSearchParams()
   // BEST 소재 기준 · 조건은 화면 상태 (주소에 남기지 않음, issue-22-tests.md 결정 7)
   const [bestOptions, setBestOptions] = useState(BEST_DEFAULT_OPTIONS)
   const media = parseMedia(searchParams.get('media'))
 
-  // 전체를 고르면 주소에서 media 를 뺀다
   function handleBestOptionChange(key, value) {
     setBestOptions((previous) => ({ ...previous, [key]: value }))
   }
 
+  // 전체를 고르면 주소에서 media 를 뺀다
   function handleMediaChange(nextMedia) {
     setSearchParams(nextMedia === null ? {} : { media: nextMedia })
   }
@@ -50,20 +53,30 @@ export function SummaryPage({ rows }) {
   // 기준일은 전체 데이터 기준 (issue-2-tests.md 결정 A)
   const latestDate = getLatestDate(rows)
 
-  // 임시: 빈 데이터 화면(버튼 포함)은 "빈 데이터 화면" 이슈(#11)에서 만든다
+  // 데이터 0건: 카드 · 그래프를 숨기고 다음 할 일을 보여 준다 (spec 결정 4)
   if (latestDate === null) {
-    return <p className="mt-6 text-sm text-ink md:mt-8">아직 데이터가 없어요</p>
+    return (
+      <>
+        <MediaFilter media={media} onChange={handleMediaChange} disabled />
+        <EmptyState
+          onTemplateDownload={onTemplateDownload}
+          onUploadResult={onUploadResult}
+        />
+      </>
+    )
   }
 
   // 카드 · 단계 흐름은 필터를 따르고, 매체별 비교는 전체 줄을 쓴다 (spec 결정 6)
   const mediaRows = filterByMedia(rows, media)
   const cards = summarizeCards(mediaRows, latestDate)
+  // 최근 7일이 다 안 차면 카드 이름 옆에 "최근 3일 기준" (issue-11-tests.md 결정 1)
+  const coverageLabel = formatCoverage(countRecentDays(mediaRows, latestDate))
   const funnel = summarizeFunnel(mediaRows, latestDate)
   const comparison = compareFunnelByMedia(rows, latestDate)
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
-  // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
   const bestCondition = formatBestCondition(bestOptions)
+  // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
   const bestGroups =
     media === null
       ? rankBestCreativesByMedia(rows, latestDate, bestOptions)
@@ -81,7 +94,11 @@ export function SummaryPage({ rows }) {
       <DataDateBar latestDate={latestDate} delayDays={delayDays} />
       <section aria-label="최근 7일 합계" className={`mt-3 ${CARD_GRID}`}>
         {cards.map((card) => (
-          <SummaryCard key={card.key} card={card} />
+          <SummaryCard
+            key={card.key}
+            card={card}
+            coverageLabel={coverageLabel}
+          />
         ))}
       </section>
       <section aria-labelledby="wow-title" className="mt-6 md:mt-8">

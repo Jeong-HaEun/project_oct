@@ -19,13 +19,19 @@ function splitUnit(text) {
   return [text.slice(0, text.length - unit.length), unit]
 }
 
-export function SummaryCard({ card }) {
+// coverageLabel: 최근 7일이 다 안 찼을 때 "최근 3일 기준" (design.md 6절), 아니면 null
+export function SummaryCard({ card, coverageLabel }) {
   const format = CARD_FORMATTERS[card.key]
   const [number, unit] = splitUnit(format(card.current))
 
   return (
     <article className="rounded-lg border border-hairline bg-surface p-3 md:p-5">
-      <h2 className="text-sm font-semibold text-muted">{card.title}</h2>
+      <h2 className="text-sm font-semibold text-muted">
+        {card.title}
+        {coverageLabel && (
+          <span className="ml-1.5 text-xs font-normal">{coverageLabel}</span>
+        )}
+      </h2>
       <p className="mt-1 whitespace-nowrap">
         <span
           className={`font-display text-xl font-extrabold tabular-nums md:text-3xl ${NUMBER_COLORS[card.key]}`}
@@ -37,10 +43,15 @@ export function SummaryCard({ card }) {
       <p className="mt-2 text-xs text-muted tabular-nums">
         전주 {format(card.previous)}
       </p>
-      {card.change && (
-        <div className="mt-1">
-          <ChangeBadge change={card.change} />
-        </div>
+      {/* 전주 7일이 다 없으면 비교하지 않는다 (design.md 5-5 비교 불가) */}
+      {card.previous === null ? (
+        <p className="mt-1 text-xs text-muted">- 비교할 지난주 데이터 없음</p>
+      ) : (
+        card.change && (
+          <div className="mt-1">
+            <ChangeBadge change={card.change} />
+          </div>
+        )
       )}
     </article>
   )

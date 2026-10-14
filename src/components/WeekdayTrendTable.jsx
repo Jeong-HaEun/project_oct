@@ -1,4 +1,4 @@
-// 최근 14주 같은 요일 표 (design.md 5-7). 최신 주가 위, 데이터 없는 주는 '-'.
+// 최근 4주 같은 요일 표 (design.md 5-7). 최신 주가 위, 데이터 없는 주는 '-'.
 // 값 계산은 metrics.js 의 summarizeSameWeekday, 여기서는 그리기만 한다.
 import { formatWeekdayDate } from '../utils/dates.js'
 import { CARD_FORMATTERS } from '../utils/format.js'

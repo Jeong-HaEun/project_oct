@@ -30,13 +30,13 @@ function card(result, key) {
 
 // ---- getSameWeekdayDates · formatWeekdayDate ----
 
-test('S1 [정상] 14주 날짜 → 10/07, 09/30 … 07/08 (07/01 은 98일 밖)', () => {
-  const dates = getSameWeekdayDates(LATEST)
-  assert.equal(dates.length, 14)
-  assert.equal(dates[0], '2026-10-07')
-  assert.equal(dates[1], '2026-09-30')
-  assert.equal(dates[13], '2026-07-08')
-  assert.ok(!dates.includes('2026-07-01'))
+test('S1 [정상] 4주 날짜 → 10/07 · 09/30 · 09/23 · 09/16 (09/09 는 5주째라 없음)', () => {
+  assert.deepEqual(getSameWeekdayDates(LATEST), [
+    '2026-10-07',
+    '2026-09-30',
+    '2026-09-23',
+    '2026-09-16',
+  ])
 })
 
 test('S2 [경계] 해 넘김 → 2026-01-06 의 지난주는 2025-12-30', () => {
@@ -114,11 +114,11 @@ test('S9 [경계] 기준일 값 없음 → current · change · delta 모두 nul
   }
 })
 
-test('S10 [정상] 14주 흐름 → 데이터 없는 주는 0 이 아니라 null', () => {
+test('S10 [정상] 4주 흐름 → 데이터 없는 주는 0 이 아니라 null', () => {
   const day = { cost: 100000, revenue: 300000 }
   const rows = [row('2026-10-07', day), row('2026-09-23', day)]
   const { trend } = summarizeSameWeekday(rows, LATEST)
-  assert.equal(trend.length, 14)
+  assert.equal(trend.length, 4)
   assert.equal(trend[0].date, '2026-10-07')
   assert.equal(trend[0].cost, 100000)
   assert.deepEqual(trend[1], {
@@ -139,15 +139,15 @@ test('S11 [경계] 다른 요일은 안 섞임 → 10/06(화) 줄은 빠짐', ()
   assert.equal(summarizeSameWeekday(rows, LATEST).trend[0].cost, 100000)
 })
 
-test('S12 [경계] 98일 경계 → 07/08 은 trend[13], 07/01 은 없음', () => {
+test('S12 [경계] 4주 경계 → 09/16 은 trend[3], 09/09 는 없음', () => {
   const rows = [
-    row('2026-07-08', { cost: 100000 }),
-    row('2026-07-01', { cost: 50000 }),
+    row('2026-09-16', { cost: 100000 }),
+    row('2026-09-09', { cost: 50000 }),
   ]
   const { trend } = summarizeSameWeekday(rows, LATEST)
-  assert.equal(trend[13].date, '2026-07-08')
-  assert.equal(trend[13].cost, 100000)
-  assert.ok(!trend.some((item) => item.date === '2026-07-01'))
+  assert.equal(trend[3].date, '2026-09-16')
+  assert.equal(trend[3].cost, 100000)
+  assert.ok(!trend.some((item) => item.date === '2026-09-09'))
 })
 
 test('S13 [예외] 그날 광고비 0 → 광고비 · 매출 0, ROAS · CPA null', () => {

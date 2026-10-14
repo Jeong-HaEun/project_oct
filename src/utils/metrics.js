@@ -322,7 +322,7 @@ export function rankBestCreativesByMedia(rows, latestDate, options = {}) {
 
 // ---- 동요일 비교 (이슈 #18) ----
 
-// 기준일 vs 지난주 같은 요일 (MoM 과 같은 모양) + 14주 같은 요일 흐름. 데이터 없는 날은 null
+// 기준일 vs 지난주 같은 요일 (MoM 과 같은 모양) + 최근 4주 같은 요일 흐름. 데이터 없는 날은 null
 export function summarizeSameWeekday(rows, latestDate) {
   if (latestDate === null) return null
 

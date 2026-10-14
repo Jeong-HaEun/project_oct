@@ -143,8 +143,8 @@ export function countRecentDays(rows, latestDate) {
   return countDays(rows, current.start, current.end)
 }
 
-// 기준일과 같은 요일 14개 (최신 먼저): 기준일, 7일 전 … 91일 전 = 98일 범위 안 (이슈 #18)
-const SAME_WEEKDAY_WEEKS = 14
+// 기준일과 같은 요일 4개 (최신 먼저): 기준일, 7일 전, 14일 전, 21일 전 (이슈 #18, #31 에서 14주 → 4주)
+const SAME_WEEKDAY_WEEKS = 4
 
 export function getSameWeekdayDates(latestDate) {
   return Array.from({ length: SAME_WEEKDAY_WEEKS }, (_, week) =>

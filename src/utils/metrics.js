@@ -395,3 +395,29 @@ export function summarizeDailyTrend(rows, latestDate) {
     }
   })
 }
+
+// ---- 월 누적 표 · 일자별 표 (이슈 #14) ----
+
+// 광고비 ÷ 개수 (CPC · CPB). 개수 0 이면 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function calcCostPer(cost, count) {
+  throw new Error('not implemented')
+}
+
+// 표 한 줄 11칸. 합계끼리 나누고, 줄이 없으면 모두 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeTotals(rows) {
+  throw new Error('not implemented')
+}
+
+// 최근 3개월 (최신 월이 위)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildMonthTable(rows, latestDate) {
+  throw new Error('not implemented')
+}
+
+// 최근 14일 (최신 날짜가 위)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildDailyTable(rows, latestDate) {
+  throw new Error('not implemented')
+}

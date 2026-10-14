@@ -156,7 +156,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
           emptyMessage="비교할 지난주 같은 요일 데이터 없음"
         />
         <p className="mt-4 text-xs text-muted">
-          최근 14주 같은 요일 · 데이터 없는 주는 -
+          최근 4주 같은 요일 · 데이터 없는 주는 -
         </p>
         <WeekdayTrendTable trend={weekday.trend} />
       </section>

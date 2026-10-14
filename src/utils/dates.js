@@ -134,3 +134,9 @@ export function formatRangeLabel({ start, end }) {
   if (start === end) return formatShortDate(end)
   return `${formatShortDate(start)}~${formatShortDate(end)}`
 }
+
+// 최근 7일 안에 데이터가 있는 날 수 0~7 (이슈 #11, 매체 필터를 거친 줄을 받는다)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function countRecentDays(rows, latestDate) {
+  throw new Error('not implemented')
+}

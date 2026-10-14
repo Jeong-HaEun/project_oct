@@ -220,3 +220,12 @@ export function formatWeekdays(weekdays) {
     .map((option) => option.label)
     .join('')
 }
+
+// ---- 일자별 추이 (이슈 #12) ----
+
+// 기준일을 포함한 14일 (오래된 날 먼저)
+export function getLast14Days(latestDate) {
+  return Array.from({ length: 14 }, (_, index) =>
+    daysBefore(latestDate, 13 - index),
+  )
+}

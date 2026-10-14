@@ -48,3 +48,10 @@ export function formatCoverage(days) {
   if (days === 0) return '최근 7일 데이터 없음'
   return `최근 ${days}일 기준`
 }
+
+// 세로축용 짧은 숫자: 9,999 → '9,999', 15,000 → '1.5만' (이슈 #12 결정 3)
+export function formatCompactWon(value) {
+  if (value < 10000) return value.toLocaleString('ko-KR')
+  // 소수 첫째 자리까지, '.0' 은 뗀다 (Number 가 1.0 → 1 로 바꿔 줌)
+  return `${Number((value / 10000).toFixed(1))}만`
+}

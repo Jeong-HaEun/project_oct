@@ -3,6 +3,8 @@ import {
   countDays,
   filterByDateRange,
   formatMonthLabel,
+  formatShortDate,
+  getLast14Days,
   getMonthToDateRanges,
   getRangeLength,
   getRecentMonthRanges,
@@ -360,5 +362,36 @@ export function summarizeMonthTrend(rows, latestDate) {
   return getRecentMonthRanges(latestDate).map((range) => {
     const { roas, cpa } = cardValues(rows, range)
     return { label: formatMonthLabel(range), roas, cpa }
+  })
+}
+
+// ---- 일자별 추이 (이슈 #12) ----
+
+// 최근 14일 하루마다 ROAS · CPA. 값이 없으면 null 과 그 이유(툴팁에 보여 줌)
+export function summarizeDailyTrend(rows, latestDate) {
+  if (latestDate === null) return []
+  return getLast14Days(latestDate).map((date) => {
+    const label = formatShortDate(date)
+    // 그날 줄이 하나도 없으면 0 이 아니라 '데이터 없음' (결정 1)
+    if (!rows.some((row) => row.reportDate === date)) {
+      const note = '데이터 없음'
+      return {
+        date,
+        label,
+        roas: null,
+        cpa: null,
+        roasNote: note,
+        cpaNote: note,
+      }
+    }
+    const { roas, cpa } = cardValues(rows, { start: date, end: date })
+    return {
+      date,
+      label,
+      roas,
+      cpa,
+      roasNote: roas === null ? '광고비 0원이라 계산 불가' : null,
+      cpaNote: cpa === null ? '구매 0건이라 계산 불가' : null,
+    }
   })
 }

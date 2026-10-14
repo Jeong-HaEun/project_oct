@@ -81,7 +81,16 @@ export function App() {
           <LoadingState />
         ) : (
           <Routes>
-            <Route path="/" element={<SummaryPage rows={rows} />} />
+            <Route
+              path="/"
+              element={
+                <SummaryPage
+                  rows={rows}
+                  onTemplateDownload={handleTemplateDownload}
+                  onUploadResult={handleUploadResult}
+                />
+              }
+            />
             <Route path="/data" element={<DataPage rows={rows} />} />
           </Routes>
         )}

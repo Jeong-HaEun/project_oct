@@ -179,6 +179,22 @@ rounded-lg border border-hairline bg-surface p-4 md:p-5
 - 날짜 칸: `h-11 rounded border border-hairline bg-surface px-3 text-sm text-ink tabular-nums` + 키보드 선택은 버튼과 같은 `focus-visible:` 클래스. 이름표 "시작일" · "끝일" 은 `text-xs text-muted`.
 - 잘못된 기간 안내: `text-sm text-bad`.
 
+### 5-11. 퍼널 띠 (요약 페이지 단계 흐름, 2026-10-14)
+
+모양만 보여 주는 띠다. 폭은 **데이터와 상관없이 고정**이고, 크기 비교는 띠 안의 숫자와 띠 사이 비율로 한다.
+
+| 부분         | 클래스                                                                          |
+| ------------ | ------------------------------------------------------------------------------- |
+| 감싸는 상자  | `mx-auto flex max-w-xl flex-col items-center gap-1`                             |
+| 띠 공통      | `rounded bg-primary-tint px-3 py-2 text-center`                                 |
+| 띠 폭 (고정) | 노출 `w-full` → 클릭 `w-5/6` → 장바구니 `w-2/3` → 구매 `w-1/2`                  |
+| 단계 이름    | `text-xs font-semibold text-ink`                                                |
+| 숫자         | `font-display text-xl font-extrabold tabular-nums text-ink md:text-3xl`         |
+| 띠 사이 비율 | `text-xs text-muted` + `↓` (값은 `text-sm font-semibold text-ink tabular-nums`) |
+
+- 휴대폰 · 넓은 화면 모두 세로 (위 → 아래로 좁아짐).
+- 띠 위 글자는 `ink` 만 쓴다: `ink` / `primary-tint` 14.7:1, `muted` / `primary-tint` 4.22:1 (기준 미달이라 쓰지 않음).
+
 ## 6. 화면 상태 (spec 결정 4)
 
 | 상태        | 모양                                                                                                                                    |

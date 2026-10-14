@@ -2,6 +2,7 @@
 // 값 계산은 metrics.js 의 summarizeSameWeekday, 여기서는 그리기만 한다.
 import { formatWeekdayDate } from '../utils/dates.js'
 import { CARD_FORMATTERS } from '../utils/format.js'
+import { NumberText } from './NumberText.jsx'
 
 const HEAD_CELL =
   'whitespace-nowrap bg-canvas px-3 py-2 text-xs font-semibold text-muted'
@@ -47,9 +48,11 @@ export function WeekdayTrendTable({ trend }) {
               {COLUMNS.map((column) => (
                 <td
                   key={column.key}
-                  className={`${BODY_CELL} text-right tabular-nums ${day[column.key] === null ? 'text-muted' : ''}`}
+                  className={`${BODY_CELL} text-right tabular-nums`}
                 >
-                  {CARD_FORMATTERS[column.key](day[column.key])}
+                  <NumberText
+                    text={CARD_FORMATTERS[column.key](day[column.key])}
+                  />
                 </td>
               ))}
             </tr>

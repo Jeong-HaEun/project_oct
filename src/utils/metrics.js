@@ -4,6 +4,7 @@ import {
   filterByDateRange,
   formatMonthLabel,
   formatShortDate,
+  formatWeekdayDate,
   getLast14Days,
   getMonthToDateRanges,
   getRangeLength,
@@ -394,4 +395,53 @@ export function summarizeDailyTrend(rows, latestDate) {
       cpaNote: cpa === null ? '구매 0건이라 계산 불가' : null,
     }
   })
+}
+
+// ---- 월 누적 표 · 일자별 표 (이슈 #14) ----
+
+// 광고비 ÷ 개수 (CPC · CPB). 개수 0 이면 null
+export function calcCostPer(cost, count) {
+  if (count === 0) return null
+  return cost / count
+}
+
+// 표 칸 순서 (MetricTable 과 같은 순서)
+const TABLE_KEYS = [...NUMBER_FIELDS, 'ctr', 'cpc', 'cpb', 'cpa', 'roas']
+
+// 표 한 줄 11칸. 합계끼리 나누고, 줄이 없으면 모두 null (issue-14-tests.md 결정 1)
+export function summarizeTotals(rows) {
+  if (rows.length === 0) {
+    return Object.fromEntries(TABLE_KEYS.map((key) => [key, null]))
+  }
+  const totals = sumTotals(rows)
+  return {
+    ...totals,
+    ctr: calcRate(totals.clicks, totals.impressions),
+    cpc: calcCostPer(totals.cost, totals.clicks),
+    cpb: calcCostPer(totals.cost, totals.carts),
+    cpa: calcCpa(totals.cost, totals.conversions),
+    roas: calcRoas(totals.revenue, totals.cost),
+  }
+}
+
+// 최근 3개월 (최신 월이 위, metrics.md 기간 규칙)
+export function buildMonthTable(rows, latestDate) {
+  if (latestDate === null) return []
+  return getRecentMonthRanges(latestDate)
+    .map((range) => ({
+      label: formatMonthLabel(range),
+      ...summarizeTotals(filterByDateRange(rows, range.start, range.end)),
+    }))
+    .reverse()
+}
+
+// 최근 14일 (최신 날짜가 위, 그래프와 같은 기간)
+export function buildDailyTable(rows, latestDate) {
+  if (latestDate === null) return []
+  return getLast14Days(latestDate)
+    .map((date) => ({
+      label: formatWeekdayDate(date),
+      ...summarizeTotals(filterByDateRange(rows, date, date)),
+    }))
+    .reverse()
 }

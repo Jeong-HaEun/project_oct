@@ -11,6 +11,7 @@ import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
 import { PeriodBars } from '../components/PeriodBars.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
+import { TrendChart } from '../components/TrendChart.jsx'
 import { WeekdayTrendTable } from '../components/WeekdayTrendTable.jsx'
 import {
   formatMonthRange,
@@ -21,7 +22,12 @@ import {
   countRecentDays,
   getUploadDelayDays,
 } from '../utils/dates.js'
-import { formatBestCondition, formatCoverage } from '../utils/format.js'
+import {
+  formatBestCondition,
+  formatCoverage,
+  formatPercent,
+  formatWon,
+} from '../utils/format.js'
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   BEST_DEFAULT_OPTIONS,
@@ -31,6 +37,7 @@ import {
   summarizeCards,
   summarizeFunnel,
   summarizeMom,
+  summarizeMonthTrend,
   summarizeSameWeekday,
 } from '../utils/metrics.js'
 
@@ -79,6 +86,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
   const weekday = summarizeSameWeekday(mediaRows, latestDate)
+  const monthTrend = summarizeMonthTrend(mediaRows, latestDate)
   const bestCondition = formatBestCondition(bestOptions)
   // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
   const bestGroups =
@@ -151,6 +159,33 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
           최근 14주 같은 요일 · 데이터 없는 주는 -
         </p>
         <WeekdayTrendTable trend={weekday.trend} />
+      </section>
+      <section aria-labelledby="month-trend-title" className="mt-6 md:mt-8">
+        <h2 id="month-trend-title" className="font-display text-lg font-bold">
+          월 누적 추이
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 기준일이 속한 달과 그 전 2개월 · 계산할 수 없는
+          달은 선이 끊겨요
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4">
+          <TrendChart
+            title="CPA"
+            data={monthTrend.map((month) => ({
+              label: month.label,
+              value: month.cpa,
+            }))}
+            format={formatWon}
+          />
+          <TrendChart
+            title="ROAS"
+            data={monthTrend.map((month) => ({
+              label: month.label,
+              value: month.roas,
+            }))}
+            format={formatPercent}
+          />
+        </div>
       </section>
       <section aria-labelledby="funnel-title" className="mt-6 md:mt-8">
         <h2 id="funnel-title" className="font-display text-lg font-bold">

@@ -215,8 +215,46 @@ export function buildPeriodBars(item, previousLabel, currentLabel) {
 
 // ---- 매체별 BEST 소재 5 (이슈 #22) ----
 
+// 순위 조건 (metrics.md 인사이트 규칙: 작은 표본의 우연 배제)
+const BEST_MIN_COST = 100000
+const BEST_MIN_CONVERSIONS = 1
+const BEST_LIMIT = 5
+
 // 최근 7일을 소재별로 합친 뒤, 광고비 10만 원 이상 + 구매 1건 이상만 ROAS 높은 순 5개
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function rankBestCreatives(rows, latestDate) {
-  throw new Error('not implemented')
+  if (latestDate === null) return []
+  const { current } = getWeekRanges(latestDate)
+
+  // 캠페인 + 광고그룹 + 소재 이름이 모두 같아야 같은 소재 (결정 1)
+  const groups = new Map()
+  for (const row of filterByDateRange(rows, current.start, current.end)) {
+    const key = [row.campaignName, row.adGroupName, row.creativeName].join(
+      '\u0000',
+    )
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(row)
+  }
+
+  // 합계끼리 나눈 뒤, 합계로 조건을 본다 (날짜별 ROAS 의 평균 아님)
+  const creatives = []
+  for (const group of groups.values()) {
+    const totals = sumTotals(group)
+    if (totals.cost < BEST_MIN_COST) continue
+    if (totals.conversions < BEST_MIN_CONVERSIONS) continue
+    const { campaignName, adGroupName, creativeName } = group[0]
+    creatives.push({
+      campaignName,
+      adGroupName,
+      creativeName,
+      cost: totals.cost,
+      revenue: totals.revenue,
+      roas: calcRoas(totals.revenue, totals.cost),
+      cpa: calcCpa(totals.cost, totals.conversions),
+    })
+  }
+
+  // ROAS 같으면 매출 큰 쪽 먼저 (결정 2)
+  return creatives
+    .sort((a, b) => b.roas - a.roas || b.revenue - a.revenue)
+    .slice(0, BEST_LIMIT)
 }

@@ -1,6 +1,7 @@
 // 요약 페이지 (/). 계산은 utils 함수를 부르기만 한다.
 // 매체 필터 값은 주소(?media=)가 보관한다 (PRD ADR-3).
 import { useSearchParams } from 'react-router'
+import { BestCreatives } from '../components/BestCreatives.jsx'
 import { DataDateBar } from '../components/DataDateBar.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
@@ -17,6 +18,7 @@ import {
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   compareFunnelByMedia,
+  rankBestCreatives,
   summarizeCards,
   summarizeFunnel,
   summarizeMom,
@@ -46,6 +48,7 @@ export function SummaryPage({ rows }) {
   const comparison = compareFunnelByMedia(rows, latestDate)
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
+  const bestCreatives = rankBestCreatives(mediaRows, latestDate)
   const delayDays = getUploadDelayDays(latestDate, getTodayKst())
 
   return (
@@ -93,6 +96,16 @@ export function SummaryPage({ rows }) {
           <FunnelFlow funnel={funnel} scopeLabel={media ?? '전체'} />
           <FunnelCompare comparison={comparison} />
         </div>
+      </section>
+      <section aria-labelledby="best-title" className="mt-6 md:mt-8">
+        <h2 id="best-title" className="font-display text-lg font-bold">
+          BEST 소재 5
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 최근 7일 · ROAS 높은 순 · 광고비 10만 원 이상 ·
+          구매 1건 이상
+        </p>
+        <BestCreatives media={media} items={bestCreatives} />
       </section>
     </>
   )

@@ -50,7 +50,8 @@ export function formatCoverage(days) {
 }
 
 // 세로축용 짧은 숫자: 9,999 → '9,999', 15,000 → '1.5만' (이슈 #12 결정 3)
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function formatCompactWon(value) {
-  throw new Error('not implemented')
+  if (value < 10000) return value.toLocaleString('ko-KR')
+  // 소수 첫째 자리까지, '.0' 은 뗀다 (Number 가 1.0 → 1 로 바꿔 줌)
+  return `${Number((value / 10000).toFixed(1))}만`
 }

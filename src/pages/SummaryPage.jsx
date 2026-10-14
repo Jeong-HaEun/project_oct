@@ -24,6 +24,7 @@ import {
 } from '../utils/dates.js'
 import {
   formatBestCondition,
+  formatCompactWon,
   formatCoverage,
   formatPercent,
   formatWon,
@@ -37,6 +38,7 @@ import {
   summarizeCards,
   summarizeFunnel,
   summarizeMom,
+  summarizeDailyTrend,
   summarizeMonthTrend,
   summarizeSameWeekday,
 } from '../utils/metrics.js'
@@ -86,6 +88,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
   const weekday = summarizeSameWeekday(mediaRows, latestDate)
+  const dailyTrend = summarizeDailyTrend(mediaRows, latestDate)
   const monthTrend = summarizeMonthTrend(mediaRows, latestDate)
   const bestCondition = formatBestCondition(bestOptions)
   // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
@@ -160,6 +163,37 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
         </p>
         <WeekdayTrendTable trend={weekday.trend} />
       </section>
+      <section aria-labelledby="daily-trend-title" className="mt-6 md:mt-8">
+        <h2 id="daily-trend-title" className="font-display text-lg font-bold">
+          일자별 추이 (최근 14일)
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 데이터 없는 날 · 계산할 수 없는 날은 선이 끊겨요
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4">
+          <TrendChart
+            title="CPA"
+            data={dailyTrend.map((day) => ({
+              label: day.label,
+              tooltipLabel: formatWeekdayDate(day.date),
+              value: day.cpa,
+              note: day.cpaNote,
+            }))}
+            format={formatWon}
+            axisFormat={formatCompactWon}
+          />
+          <TrendChart
+            title="ROAS"
+            data={dailyTrend.map((day) => ({
+              label: day.label,
+              tooltipLabel: formatWeekdayDate(day.date),
+              value: day.roas,
+              note: day.roasNote,
+            }))}
+            format={formatPercent}
+          />
+        </div>
+      </section>
       <section aria-labelledby="month-trend-title" className="mt-6 md:mt-8">
         <h2 id="month-trend-title" className="font-display text-lg font-bold">
           월 누적 추이
@@ -176,6 +210,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
               value: month.cpa,
             }))}
             format={formatWon}
+            axisFormat={formatCompactWon}
           />
           <TrendChart
             title="ROAS"

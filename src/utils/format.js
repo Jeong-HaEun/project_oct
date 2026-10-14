@@ -34,3 +34,10 @@ export function formatDelta(delta) {
   if (delta === null) return ''
   return `${Math.round(Math.abs(delta.value))}${delta.unit}`
 }
+
+// BEST 소재 조건 글: '광고비 10만 원 이상 · 구매 1건 이상' (이슈 #22 결정 7)
+export function formatBestCondition({ minCost, minConversions }) {
+  const cost =
+    minCost === 0 ? '광고비 제한 없음' : `광고비 ${minCost / 10000}만 원 이상`
+  return `${cost} · 구매 ${minConversions}건 이상`
+}

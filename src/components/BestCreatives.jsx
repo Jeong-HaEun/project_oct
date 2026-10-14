@@ -1,5 +1,10 @@
 // 매체별 BEST 소재 5 표 (design.md 5-7 표, 5-2 카드). 순위 계산은 metrics.js 의 rankBestCreatives.
-import { formatPercent, formatWon } from '../utils/format.js'
+import {
+  formatCount,
+  formatPercent,
+  formatRate,
+  formatWon,
+} from '../utils/format.js'
 
 const HEAD_CELL =
   'whitespace-nowrap bg-canvas px-3 py-2 text-xs font-semibold text-muted'
@@ -11,27 +16,44 @@ const NAME_COLUMNS = [
   { key: 'campaignName', label: '캠페인' },
 ]
 
+// 노출 · CTR 은 순위 기준이 아니라 참고 칸 (issue-22-tests.md 결정 6)
 const NUMBER_COLUMNS = [
+  { key: 'impressions', label: '노출', format: formatCount },
+  { key: 'ctr', label: 'CTR', format: formatRate },
+  { key: 'conversions', label: '구매', format: formatCount },
   { key: 'cost', label: '광고비', format: formatWon },
   { key: 'revenue', label: '매출', format: formatWon },
   { key: 'roas', label: 'ROAS', format: formatPercent },
   { key: 'cpa', label: 'CPA', format: formatWon },
 ]
 
-export function BestCreatives({ media, items }) {
-  if (media === null) {
-    return <Notice>매체를 고르면 BEST 소재를 볼 수 있어요</Notice>
-  }
+// groups: [{ media, items }]. [전체] 면 3개(매체 이름 표시), 매체를 고르면 1개
+// sortBy: 순위 기준 칸 머리글을 진하게 · conditionText: 빈 목록 문구의 조건 글
+export function BestCreatives({
+  groups,
+  showMediaName,
+  sortBy,
+  conditionText,
+}) {
+  return groups.map(({ media, items }) => (
+    <div key={media} className="mt-3">
+      {showMediaName && <h3 className="mb-2 text-sm font-semibold">{media}</h3>}
+      <CreativeTable
+        items={items}
+        sortBy={sortBy}
+        conditionText={conditionText}
+      />
+    </div>
+  ))
+}
+
+function CreativeTable({ items, sortBy, conditionText }) {
   if (items.length === 0) {
-    return (
-      <Notice>
-        조건에 맞는 소재가 없어요 (광고비 10만 원 이상 · 구매 1건 이상)
-      </Notice>
-    )
+    return <Notice>조건에 맞는 소재가 없어요 ({conditionText})</Notice>
   }
 
   return (
-    <div className="mt-3 overflow-x-auto rounded-lg border border-hairline bg-surface">
+    <div className="overflow-x-auto rounded-lg border border-hairline bg-surface">
       <table className="w-full text-sm">
         <thead>
           <tr>
@@ -51,7 +73,8 @@ export function BestCreatives({ media, items }) {
               <th
                 key={column.key}
                 scope="col"
-                className={`${HEAD_CELL} text-right`}
+                aria-sort={column.key === sortBy ? 'descending' : undefined}
+                className={`${HEAD_CELL} text-right aria-[sort=descending]:text-ink`}
               >
                 {column.label}
               </th>
@@ -97,7 +120,7 @@ export function BestCreatives({ media, items }) {
 
 function Notice({ children }) {
   return (
-    <p className="mt-3 rounded-lg border border-hairline bg-surface p-4 text-sm text-muted md:p-5">
+    <p className="rounded-lg border border-hairline bg-surface p-4 text-sm text-muted md:p-5">
       {children}
     </p>
   )

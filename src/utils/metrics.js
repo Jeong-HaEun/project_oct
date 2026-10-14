@@ -215,13 +215,52 @@ export function buildPeriodBars(item, previousLabel, currentLabel) {
 
 // ---- 매체별 BEST 소재 5 (이슈 #22) ----
 
-// 순위 조건 (metrics.md 인사이트 규칙: 작은 표본의 우연 배제)
-const BEST_MIN_COST = 100000
-const BEST_MIN_CONVERSIONS = 1
+// 기본값: ROAS 순, 광고비 10만 원 이상 + 구매 1건 이상 (metrics.md 인사이트 규칙: 작은 표본의 우연 배제)
+export const BEST_DEFAULT_OPTIONS = {
+  sortBy: 'roas',
+  minCost: 100000,
+  minConversions: 1,
+}
+
+// 버튼 목록 (결정 6 · 7)
+export const BEST_SORT_OPTIONS = [
+  { value: 'roas', label: 'ROAS' },
+  { value: 'conversions', label: '구매수' },
+]
+export const BEST_MIN_COST_OPTIONS = [
+  { value: 0, label: '제한 없음' },
+  { value: 50000, label: '5만' },
+  { value: 100000, label: '10만' },
+  { value: 300000, label: '30만' },
+  { value: 1000000, label: '100만' },
+]
+export const BEST_MIN_CONVERSION_OPTIONS = [
+  { value: 1, label: '1건' },
+  { value: 5, label: '5건' },
+  { value: 10, label: '10건' },
+  { value: 30, label: '30건' },
+]
+
 const BEST_LIMIT = 5
 
-// 최근 7일을 소재별로 합친 뒤, 광고비 10만 원 이상 + 구매 1건 이상만 ROAS 높은 순 5개
-export function rankBestCreatives(rows, latestDate) {
+// ROAS 높은 순 (계산 불가 null 은 맨 뒤), 같으면 매출 큰 쪽 먼저 (결정 2)
+function compareByRoas(a, b) {
+  return (b.roas ?? -Infinity) - (a.roas ?? -Infinity) || b.revenue - a.revenue
+}
+
+// 구매 많은 순, 같으면 ROAS 순 (결정 6)
+function compareByConversions(a, b) {
+  return b.conversions - a.conversions || compareByRoas(a, b)
+}
+
+const BEST_COMPARE = { roas: compareByRoas, conversions: compareByConversions }
+
+// 최근 7일을 소재별로 합친 뒤, 조건에 맞는 소재 중 캠페인마다 1위만 기준 순으로 5개
+export function rankBestCreatives(rows, latestDate, options = {}) {
+  const { sortBy, minCost, minConversions } = {
+    ...BEST_DEFAULT_OPTIONS,
+    ...options,
+  }
   if (latestDate === null) return []
   const { current } = getWeekRanges(latestDate)
 
@@ -239,22 +278,41 @@ export function rankBestCreatives(rows, latestDate) {
   const creatives = []
   for (const group of groups.values()) {
     const totals = sumTotals(group)
-    if (totals.cost < BEST_MIN_COST) continue
-    if (totals.conversions < BEST_MIN_CONVERSIONS) continue
+    if (totals.cost < minCost) continue
+    if (totals.conversions < minConversions) continue
     const { campaignName, adGroupName, creativeName } = group[0]
     creatives.push({
       campaignName,
       adGroupName,
       creativeName,
+      impressions: totals.impressions,
+      clicks: totals.clicks,
+      conversions: totals.conversions,
       cost: totals.cost,
       revenue: totals.revenue,
+      ctr: calcRate(totals.clicks, totals.impressions),
       roas: calcRoas(totals.revenue, totals.cost),
       cpa: calcCpa(totals.cost, totals.conversions),
     })
   }
 
-  // ROAS 같으면 매출 큰 쪽 먼저 (결정 2)
-  return creatives
-    .sort((a, b) => b.roas - a.roas || b.revenue - a.revenue)
-    .slice(0, BEST_LIMIT)
+  // 정렬한 뒤 캠페인마다 처음 나온 것 = 고른 기준의 캠페인 1위 (결정 5)
+  creatives.sort(BEST_COMPARE[sortBy])
+  const seenCampaigns = new Set()
+  const best = []
+  for (const item of creatives) {
+    if (seenCampaigns.has(item.campaignName)) continue
+    seenCampaigns.add(item.campaignName)
+    best.push(item)
+    if (best.length === BEST_LIMIT) break
+  }
+  return best
+}
+
+// [전체] 용: NAVER · META · GOOGLE 순서로 매체마다 BEST 5 (결정 4)
+export function rankBestCreativesByMedia(rows, latestDate, options = {}) {
+  return MEDIA_LIST.map((media) => ({
+    media,
+    items: rankBestCreatives(filterByMedia(rows, media), latestDate, options),
+  }))
 }

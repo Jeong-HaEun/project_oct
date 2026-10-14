@@ -9,6 +9,7 @@ import { EmptyState } from '../components/EmptyState.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
+import { MetricTable } from '../components/MetricTable.jsx'
 import { PeriodBars } from '../components/PeriodBars.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
 import { TrendChart } from '../components/TrendChart.jsx'
@@ -32,6 +33,8 @@ import {
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   BEST_DEFAULT_OPTIONS,
+  buildDailyTable,
+  buildMonthTable,
   compareFunnelByMedia,
   rankBestCreatives,
   rankBestCreativesByMedia,
@@ -90,6 +93,8 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const weekday = summarizeSameWeekday(mediaRows, latestDate)
   const dailyTrend = summarizeDailyTrend(mediaRows, latestDate)
   const monthTrend = summarizeMonthTrend(mediaRows, latestDate)
+  const monthTable = buildMonthTable(mediaRows, latestDate)
+  const dailyTable = buildDailyTable(mediaRows, latestDate)
   const bestCondition = formatBestCondition(bestOptions)
   // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
   const bestGroups =
@@ -246,6 +251,21 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
           sortBy={bestOptions.sortBy}
           conditionText={bestCondition}
         />
+      </section>
+      <section aria-labelledby="tables-title" className="mt-6 md:mt-8">
+        <h2 id="tables-title" className="font-display text-lg font-bold">
+          데이터 표
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 그래프로 본 흐름을 숫자로 확인해요 · 데이터 없는
+          달 · 날은 -
+        </p>
+        <h3 className="mt-3 text-sm font-semibold">월 누적 (최신 월이 위)</h3>
+        <MetricTable labelHeader="월" rows={monthTable} />
+        <h3 className="mt-4 text-sm font-semibold">
+          일자별 (최근 14일, 최신 날짜가 위)
+        </h3>
+        <MetricTable labelHeader="날짜" rows={dailyTable} />
       </section>
     </>
   )

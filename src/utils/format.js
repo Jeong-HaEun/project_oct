@@ -48,3 +48,9 @@ export function formatCoverage(days) {
   if (days === 0) return '최근 7일 데이터 없음'
   return `최근 ${days}일 기준`
 }
+
+// 세로축용 짧은 숫자: 9,999 → '9,999', 15,000 → '1.5만' (이슈 #12 결정 3)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function formatCompactWon(value) {
+  throw new Error('not implemented')
+}

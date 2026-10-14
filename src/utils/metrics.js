@@ -362,3 +362,11 @@ export function summarizeMonthTrend(rows, latestDate) {
     return { label: formatMonthLabel(range), roas, cpa }
   })
 }
+
+// ---- 일자별 추이 (이슈 #12) ----
+
+// 최근 14일 하루마다 ROAS · CPA. 값이 없으면 null 과 그 이유(툴팁에 보여 줌)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeDailyTrend(rows, latestDate) {
+  throw new Error('not implemented')
+}

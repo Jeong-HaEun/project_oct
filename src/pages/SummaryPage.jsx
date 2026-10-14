@@ -1,6 +1,9 @@
 // 요약 페이지 (/). 계산은 utils 함수를 부르기만 한다.
 // 매체 필터 값은 주소(?media=)가 보관한다 (PRD ADR-3).
+import { useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { BestCreatives } from '../components/BestCreatives.jsx'
+import { BestOptions } from '../components/BestOptions.jsx'
 import { DataDateBar } from '../components/DataDateBar.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
@@ -14,19 +17,32 @@ import {
   getTodayKst,
   getUploadDelayDays,
 } from '../utils/dates.js'
+import { formatBestCondition } from '../utils/format.js'
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
+  BEST_DEFAULT_OPTIONS,
   compareFunnelByMedia,
+  rankBestCreatives,
+  rankBestCreativesByMedia,
   summarizeCards,
   summarizeFunnel,
   summarizeMom,
 } from '../utils/metrics.js'
 
+// BEST 소재 부제에 쓰는 순위 기준 글
+const SORT_TEXT = { roas: 'ROAS 높은 순', conversions: '구매 많은 순' }
+
 export function SummaryPage({ rows }) {
   const [searchParams, setSearchParams] = useSearchParams()
+  // BEST 소재 기준 · 조건은 화면 상태 (주소에 남기지 않음, issue-22-tests.md 결정 7)
+  const [bestOptions, setBestOptions] = useState(BEST_DEFAULT_OPTIONS)
   const media = parseMedia(searchParams.get('media'))
 
   // 전체를 고르면 주소에서 media 를 뺀다
+  function handleBestOptionChange(key, value) {
+    setBestOptions((previous) => ({ ...previous, [key]: value }))
+  }
+
   function handleMediaChange(nextMedia) {
     setSearchParams(nextMedia === null ? {} : { media: nextMedia })
   }
@@ -46,6 +62,17 @@ export function SummaryPage({ rows }) {
   const comparison = compareFunnelByMedia(rows, latestDate)
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
+  // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
+  const bestCondition = formatBestCondition(bestOptions)
+  const bestGroups =
+    media === null
+      ? rankBestCreativesByMedia(rows, latestDate, bestOptions)
+      : [
+          {
+            media,
+            items: rankBestCreatives(mediaRows, latestDate, bestOptions),
+          },
+        ]
   const delayDays = getUploadDelayDays(latestDate, getTodayKst())
 
   return (
@@ -93,6 +120,22 @@ export function SummaryPage({ rows }) {
           <FunnelFlow funnel={funnel} scopeLabel={media ?? '전체'} />
           <FunnelCompare comparison={comparison} />
         </div>
+      </section>
+      <section aria-labelledby="best-title" className="mt-6 md:mt-8">
+        <h2 id="best-title" className="font-display text-lg font-bold">
+          BEST 소재 5
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 최근 7일 · {SORT_TEXT[bestOptions.sortBy]} ·{' '}
+          {bestCondition} · 캠페인당 1개
+        </p>
+        <BestOptions options={bestOptions} onChange={handleBestOptionChange} />
+        <BestCreatives
+          groups={bestGroups}
+          showMediaName={media === null}
+          sortBy={bestOptions.sortBy}
+          conditionText={bestCondition}
+        />
       </section>
     </>
   )

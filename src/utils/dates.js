@@ -188,3 +188,35 @@ export function formatMonthLabel({ start, end }) {
   if (start === end) return `${month}월 (${startDay}일)`
   return `${month}월 (${startDay}~${endDay}일)`
 }
+
+// ---- 원본 데이터 요일 필터 (이슈 #32) ----
+
+// 버튼 순서 (월요일 먼저). value 는 getDay() 번호: 일 = 0 … 토 = 6
+export const WEEKDAY_OPTIONS = [1, 2, 3, 4, 5, 6, 0].map((value) => ({
+  value,
+  label: WEEKDAY_NAMES[value],
+}))
+
+// 켜고 끄기 (월요일 먼저 순서). 다 끄거나 7개 다 켜면 [] = 전체
+export function toggleWeekday(weekdays, day) {
+  const next = weekdays.includes(day)
+    ? weekdays.filter((value) => value !== day)
+    : [...weekdays, day]
+  // 7개 다 켜면 전체와 같은 뜻 (결정 2)
+  if (next.length === WEEKDAY_OPTIONS.length) return []
+  return WEEKDAY_OPTIONS.map((option) => option.value).filter((value) =>
+    next.includes(value),
+  )
+}
+
+// 'YYYY-MM-DD' → getDay() 번호. weekdays 가 [] 이면 모든 요일 (결정 1)
+export function matchesWeekdays(date, weekdays) {
+  return weekdays.length === 0 || weekdays.includes(parseISO(date).getDay())
+}
+
+// [6, 0] → '토일', [] → ''
+export function formatWeekdays(weekdays) {
+  return WEEKDAY_OPTIONS.filter((option) => weekdays.includes(option.value))
+    .map((option) => option.label)
+    .join('')
+}

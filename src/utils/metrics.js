@@ -12,6 +12,7 @@ import {
   getSameWeekdayDates,
   getWeekRanges,
 } from './dates.js'
+import { formatRate } from './format.js'
 import { filterByMedia, MEDIA_LIST } from './media.js'
 
 const NUMBER_FIELDS = [
@@ -444,4 +445,31 @@ export function buildDailyTable(rows, latestDate) {
       ...summarizeTotals(filterByDateRange(rows, date, date)),
     }))
     .reverse()
+}
+
+// ---- 퍼널 한 줄 인사이트 (이슈 #7) ----
+
+// 최저가 있는 단계마다 { key, text, action }. 하나도 없으면 []
+// 단계마다 다음 할 일 (issue-7-tests.md 결정 3)
+const FUNNEL_ACTIONS = {
+  ctr: '소재 · 문구를 점검해 보세요',
+  cartRate: '상품 상세 페이지를 점검해 보세요',
+  purchaseRate: '결제 과정을 점검해 보세요',
+}
+
+// 퍼널 순서대로, 최저가 있는 단계만 (결정 1). 동점이면 매체를 함께 (결정 2)
+export function buildFunnelInsights(comparison) {
+  return FUNNEL_RATES.filter(
+    ({ key }) => comparison.lowest[key].length > 0,
+  ).map(({ key, label }) => {
+    const medias = comparison.lowest[key]
+    // 최저끼리는 값이 같아서 첫 매체 값을 쓴다
+    const value = comparison.byMedia.find((item) => item.media === medias[0])
+      .rates[key]
+    return {
+      key,
+      text: `${medias.join(' · ')}의 ${label}이 가장 낮아요 (${formatRate(value)})`,
+      action: FUNNEL_ACTIONS[key],
+    }
+  })
 }

@@ -8,6 +8,7 @@ import { DataDateBar } from '../components/DataDateBar.jsx'
 import { EmptyState } from '../components/EmptyState.jsx'
 import { FunnelCompare } from '../components/FunnelCompare.jsx'
 import { FunnelFlow } from '../components/FunnelFlow.jsx'
+import { FunnelInsight } from '../components/FunnelInsight.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
 import { MetricTable } from '../components/MetricTable.jsx'
 import { PeriodBars } from '../components/PeriodBars.jsx'
@@ -33,6 +34,7 @@ import {
 import { filterByMedia, parseMedia } from '../utils/media.js'
 import {
   BEST_DEFAULT_OPTIONS,
+  buildFunnelInsights,
   buildDailyTable,
   buildMonthTable,
   compareFunnelByMedia,
@@ -88,6 +90,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const coverageLabel = formatCoverage(countRecentDays(mediaRows, latestDate))
   const funnel = summarizeFunnel(mediaRows, latestDate)
   const comparison = compareFunnelByMedia(rows, latestDate)
+  const funnelInsights = buildFunnelInsights(comparison)
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
   const weekday = summarizeSameWeekday(mediaRows, latestDate)
@@ -234,6 +237,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
         <div className="mt-3">
           <FunnelFlow funnel={funnel} scopeLabel={media ?? '전체'} />
           <FunnelCompare comparison={comparison} />
+          <FunnelInsight insights={funnelInsights} />
         </div>
       </section>
       <section aria-labelledby="best-title" className="mt-6 md:mt-8">

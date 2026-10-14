@@ -141,3 +141,15 @@ export function countRecentDays(rows, latestDate) {
   const { current } = getWeekRanges(latestDate)
   return countDays(rows, current.start, current.end)
 }
+
+// 기준일과 같은 요일 14개 (최신 먼저): 기준일, 7일 전 … 91일 전 = 98일 범위 안 (이슈 #18)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function getSameWeekdayDates(latestDate) {
+  throw new Error('not implemented')
+}
+
+// '2026-10-07' → '10/7(수)'
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function formatWeekdayDate(date) {
+  throw new Error('not implemented')
+}

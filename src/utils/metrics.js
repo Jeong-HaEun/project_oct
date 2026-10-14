@@ -316,3 +316,11 @@ export function rankBestCreativesByMedia(rows, latestDate, options = {}) {
     items: rankBestCreatives(filterByMedia(rows, media), latestDate, options),
   }))
 }
+
+// ---- 동요일 비교 (이슈 #18) ----
+
+// 기준일 vs 지난주 같은 요일 (MoM 과 같은 모양) + 14주 같은 요일 흐름. 데이터 없는 날은 null
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeSameWeekday(rows, latestDate) {
+  throw new Error('not implemented')
+}

@@ -1,6 +1,6 @@
 // CSV 양식 함수 모음. 제목 줄 이름은 test1007 샘플 CSV 와 같다.
 import Papa from 'papaparse'
-import { filterByDateRange } from './dates.js'
+import { filterByDateRange, formatWeekdays, matchesWeekdays } from './dates.js'
 import { filterByMedia, parseMedia } from './media.js'
 
 // CSV 제목 ↔ JSON 필드 짝 (api.md 순서, id 제외). 파일에는 '전환', 화면에서만 "구매"
@@ -150,12 +150,12 @@ export function formatUploadResult({ created, updated }) {
 
 // ---- 원본 데이터 표 · 내려받기 (이슈 #15 · #19) ----
 
-// 매체 필터 + 고른 기간 + 날짜 오래된 순 (표 · 내려받기 공통)
-export function selectRows(rows, media, { start, end }) {
+// 매체 필터 + 고른 기간 + 고른 요일([] = 전체, 이슈 #32) + 날짜 오래된 순 (표 · 내려받기 공통)
+export function selectRows(rows, media, { start, end }, weekdays = []) {
   // sort 는 같은 날짜끼리 받은 순서를 지킨다
-  return [...filterByDateRange(filterByMedia(rows, media), start, end)].sort(
-    (a, b) => a.reportDate.localeCompare(b.reportDate),
-  )
+  return filterByDateRange(filterByMedia(rows, media), start, end)
+    .filter((row) => matchesWeekdays(row.reportDate, weekdays))
+    .sort((a, b) => a.reportDate.localeCompare(b.reportDate))
 }
 
 // 쉼표 · 따옴표 · 줄바꿈이 든 칸은 따옴표로 감싸고, 따옴표는 두 번 쓴다
@@ -173,7 +173,8 @@ export function buildReportsCsv(rows) {
   return BOM + [header, ...lines].map((line) => line + LINE_BREAK).join('')
 }
 
-// 'adporter_META_2026-07-02_2026-10-07.csv' (전체면 '전체')
-export function buildDownloadFileName(media, { start, end }) {
-  return `adporter_${media ?? '전체'}_${start}_${end}.csv`
+// 'adporter_META_2026-07-02_2026-10-07.csv' (전체면 '전체'). 요일을 고르면 매체 뒤에: 'adporter_전체_토일_…'
+export function buildDownloadFileName(media, { start, end }, weekdays = []) {
+  const parts = [media ?? '전체', formatWeekdays(weekdays), start, end]
+  return `adporter_${parts.filter(Boolean).join('_')}.csv`
 }

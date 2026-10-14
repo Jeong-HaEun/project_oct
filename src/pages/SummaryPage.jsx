@@ -11,8 +11,10 @@ import { FunnelFlow } from '../components/FunnelFlow.jsx'
 import { MediaFilter } from '../components/MediaFilter.jsx'
 import { PeriodBars } from '../components/PeriodBars.jsx'
 import { CARD_GRID, SummaryCard } from '../components/SummaryCard.jsx'
+import { WeekdayTrendTable } from '../components/WeekdayTrendTable.jsx'
 import {
   formatMonthRange,
+  formatWeekdayDate,
   getLatestDate,
   getMonthToDateRanges,
   getTodayKst,
@@ -29,6 +31,7 @@ import {
   summarizeCards,
   summarizeFunnel,
   summarizeMom,
+  summarizeSameWeekday,
 } from '../utils/metrics.js'
 
 // BEST 소재 부제에 쓰는 순위 기준 글
@@ -75,6 +78,7 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
   const comparison = compareFunnelByMedia(rows, latestDate)
   const momItems = summarizeMom(mediaRows, latestDate)
   const momRanges = getMonthToDateRanges(latestDate)
+  const weekday = summarizeSameWeekday(mediaRows, latestDate)
   const bestCondition = formatBestCondition(bestOptions)
   // [전체] 면 매체별 3개, 매체를 고르면 그 매체 1개 (issue-22-tests.md 결정 4)
   const bestGroups =
@@ -128,6 +132,25 @@ export function SummaryPage({ rows, onTemplateDownload, onUploadResult }) {
           currentLabel={formatMonthRange(momRanges.current)}
           emptyMessage="비교할 지난달 데이터 없음"
         />
+      </section>
+      <section aria-labelledby="weekday-title" className="mt-6 md:mt-8">
+        <h2 id="weekday-title" className="font-display text-lg font-bold">
+          동요일 비교
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          {media ?? '전체'} · 같은 요일끼리 비교해 요일 차이를 성과 변화로
+          착각하지 않게 해요
+        </p>
+        <PeriodBars
+          items={weekday.cards}
+          previousLabel={formatWeekdayDate(weekday.trend[1].date)}
+          currentLabel={formatWeekdayDate(weekday.trend[0].date)}
+          emptyMessage="비교할 지난주 같은 요일 데이터 없음"
+        />
+        <p className="mt-4 text-xs text-muted">
+          최근 14주 같은 요일 · 데이터 없는 주는 -
+        </p>
+        <WeekdayTrendTable trend={weekday.trend} />
       </section>
       <section aria-labelledby="funnel-title" className="mt-6 md:mt-8">
         <h2 id="funnel-title" className="font-display text-lg font-bold">

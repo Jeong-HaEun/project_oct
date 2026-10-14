@@ -4,6 +4,7 @@ import {
   filterByDateRange,
   getMonthToDateRanges,
   getRangeLength,
+  getSameWeekdayDates,
   getWeekRanges,
 } from './dates.js'
 import { filterByMedia, MEDIA_LIST } from './media.js'
@@ -320,7 +321,31 @@ export function rankBestCreativesByMedia(rows, latestDate, options = {}) {
 // ---- 동요일 비교 (이슈 #18) ----
 
 // 기준일 vs 지난주 같은 요일 (MoM 과 같은 모양) + 14주 같은 요일 흐름. 데이터 없는 날은 null
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function summarizeSameWeekday(rows, latestDate) {
-  throw new Error('not implemented')
+  if (latestDate === null) return null
+
+  // 하루치 4지표. 그날 줄이 하나도 없으면 0 이 아니라 null (결정 1)
+  function dayValues(date) {
+    const hasRows = rows.some((row) => row.reportDate === date)
+    if (!hasRows) return { cost: null, revenue: null, roas: null, cpa: null }
+    return cardValues(rows, { start: date, end: date })
+  }
+
+  const trend = getSameWeekdayDates(latestDate).map((date) => ({
+    date,
+    ...dayValues(date),
+  }))
+  const [now, before] = trend
+
+  return {
+    cards: CARDS.map(({ key, title, goodWhen }) => ({
+      key,
+      title,
+      current: now[key],
+      previous: before[key],
+      change: compareChange(now[key], before[key], goodWhen),
+      delta: calcMomDelta(key, now[key], before[key]),
+    })),
+    trend,
+  }
 }

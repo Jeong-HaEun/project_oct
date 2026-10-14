@@ -143,13 +143,18 @@ export function countRecentDays(rows, latestDate) {
 }
 
 // 기준일과 같은 요일 14개 (최신 먼저): 기준일, 7일 전 … 91일 전 = 98일 범위 안 (이슈 #18)
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+const SAME_WEEKDAY_WEEKS = 14
+
 export function getSameWeekdayDates(latestDate) {
-  throw new Error('not implemented')
+  return Array.from({ length: SAME_WEEKDAY_WEEKS }, (_, week) =>
+    daysBefore(latestDate, week * 7),
+  )
 }
 
+// getDay() 순서: 0 = 일요일
+const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
+
 // '2026-10-07' → '10/7(수)'
-// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
 export function formatWeekdayDate(date) {
-  throw new Error('not implemented')
+  return `${formatShortDate(date)}(${WEEKDAY_NAMES[parseISO(date).getDay()]})`
 }

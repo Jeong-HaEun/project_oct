@@ -212,3 +212,11 @@ export function buildPeriodBars(item, previousLabel, currentLabel) {
     { key: 'current', label: currentLabel, value: item.current },
   ]
 }
+
+// ---- 매체별 BEST 소재 5 (이슈 #22) ----
+
+// 최근 7일을 소재별로 합친 뒤, 광고비 10만 원 이상 + 구매 1건 이상만 ROAS 높은 순 5개
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function rankBestCreatives(rows, latestDate) {
+  throw new Error('not implemented')
+}

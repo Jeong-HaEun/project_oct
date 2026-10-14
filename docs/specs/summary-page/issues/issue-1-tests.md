@@ -27,7 +27,7 @@
 ### 값 약속
 
 - `compareChange` 의 `direction`: `'up'` · `'down'` · `'same'`
-- `compareChange` 의 `tone`: `'good'`(파랑) · `'bad'`(빨강) · `'neutral'`(회색)
+- `compareChange` 의 `tone`: `'good'`(청록빛 초록) · `'bad'`(빨강) · `'neutral'`(회색)
 - `compareChange` 의 `label`: `'개선'` · `'악화'` · `'변화'`(광고비) · `'변화 없음'`(값이 같을 때)
 - 값이 같으면(`'same'`) 화면에는 회색 `– 변화 없음` 으로 보여준다.
 - `summarizeCards` 카드 순서와 `key`·`goodWhen`:

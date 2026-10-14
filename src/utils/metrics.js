@@ -445,3 +445,11 @@ export function buildDailyTable(rows, latestDate) {
     }))
     .reverse()
 }
+
+// ---- 퍼널 한 줄 인사이트 (이슈 #7) ----
+
+// 최저가 있는 단계마다 { key, text, action }. 하나도 없으면 []
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function buildFunnelInsights(comparison) {
+  throw new Error('not implemented')
+}

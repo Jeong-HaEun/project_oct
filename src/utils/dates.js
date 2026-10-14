@@ -1,6 +1,7 @@
 // 날짜 계산 함수 모음. 날짜는 "YYYY-MM-DD" 문자열로 주고받는다.
 import {
   differenceInCalendarDays,
+  endOfMonth,
   format,
   parseISO,
   startOfMonth,
@@ -157,4 +158,33 @@ const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 // '2026-10-07' → '10/7(수)'
 export function formatWeekdayDate(date) {
   return `${formatShortDate(date)}(${WEEKDAY_NAMES[parseISO(date).getDay()]})`
+}
+
+// ---- 월 누적 선 그래프 (이슈 #24) ----
+
+// 기준일이 속한 달 + 그 전 2개월 (오래된 달 먼저). 지난 달은 1일~말일, 이번 달은 1일~기준일
+export function getRecentMonthRanges(latestDate) {
+  const date = parseISO(latestDate)
+  const pastMonths = [2, 1].map((back) => {
+    const monthStart = startOfMonth(subMonths(date, back))
+    return {
+      start: toDateText(monthStart),
+      end: toDateText(endOfMonth(monthStart)),
+    }
+  })
+  return [
+    ...pastMonths,
+    { start: toDateText(startOfMonth(date)), end: latestDate },
+  ]
+}
+
+// { start, end } → 한 달이 다 찼으면 '9월', 아니면 '10월 (1~7일)'
+export function formatMonthLabel({ start, end }) {
+  const month = Number(start.split('-')[1])
+  // 1일부터 말일까지 다 찼으면 달 이름만 (결정 3)
+  if (end === toDateText(endOfMonth(parseISO(start)))) return `${month}월`
+  const startDay = Number(start.split('-')[2])
+  const endDay = Number(end.split('-')[2])
+  if (start === end) return `${month}월 (${startDay}일)`
+  return `${month}월 (${startDay}~${endDay}일)`
 }

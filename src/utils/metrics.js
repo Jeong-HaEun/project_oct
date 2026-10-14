@@ -2,8 +2,10 @@
 import {
   countDays,
   filterByDateRange,
+  formatMonthLabel,
   getMonthToDateRanges,
   getRangeLength,
+  getRecentMonthRanges,
   getSameWeekdayDates,
   getWeekRanges,
 } from './dates.js'
@@ -348,4 +350,15 @@ export function summarizeSameWeekday(rows, latestDate) {
     })),
     trend,
   }
+}
+
+// ---- 월 누적 선 그래프 (이슈 #24) ----
+
+// 최근 3개월 달마다 합계끼리 나눈 ROAS · CPA. 계산할 수 없으면 null (그래프 선이 끊김)
+export function summarizeMonthTrend(rows, latestDate) {
+  if (latestDate === null) return []
+  return getRecentMonthRanges(latestDate).map((range) => {
+    const { roas, cpa } = cardValues(rows, range)
+    return { label: formatMonthLabel(range), roas, cpa }
+  })
 }

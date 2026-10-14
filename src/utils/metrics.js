@@ -349,3 +349,11 @@ export function summarizeSameWeekday(rows, latestDate) {
     trend,
   }
 }
+
+// ---- 월 누적 선 그래프 (이슈 #24) ----
+
+// 최근 3개월 달마다 합계끼리 나눈 ROAS · CPA. 계산할 수 없으면 null (그래프 선이 끊김)
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function summarizeMonthTrend(rows, latestDate) {
+  throw new Error('not implemented')
+}

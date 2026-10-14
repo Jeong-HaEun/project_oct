@@ -158,3 +158,17 @@ const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 export function formatWeekdayDate(date) {
   return `${formatShortDate(date)}(${WEEKDAY_NAMES[parseISO(date).getDay()]})`
 }
+
+// ---- 월 누적 선 그래프 (이슈 #24) ----
+
+// 기준일이 속한 달 + 그 전 2개월 (오래된 달 먼저). 지난 달은 1일~말일, 이번 달은 1일~기준일
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function getRecentMonthRanges(latestDate) {
+  throw new Error('not implemented')
+}
+
+// { start, end } → 한 달이 다 찼으면 '9월', 아니면 '10월 (1~7일)'
+// eslint-disable-next-line no-unused-vars -- 스텁: Green 단계에서 지운다
+export function formatMonthLabel(range) {
+  throw new Error('not implemented')
+}
